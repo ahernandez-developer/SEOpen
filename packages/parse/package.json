@@ -1,0 +1,36 @@
+{
+  "name": "@seopen/parse",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "HTML → PageSignals extraction for SEOpen.",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "test": "node --import tsx --conditions=source --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@seopen/types": "workspace:*",
+    "linkedom": "^0.18.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
