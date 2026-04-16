@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "HTML → PageSignals extraction for SEOpen.",
+  "author": "ahernandez-developer",
   "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

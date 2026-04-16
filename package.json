@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Open-source self-hostable platform for SEO and Generative Engine Optimization.",
+  "author": "ahernandez-developer",
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@9.12.3",

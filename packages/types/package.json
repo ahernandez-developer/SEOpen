@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Shared Zod schemas and TypeScript types for SEOpen packages.",
+  "author": "ahernandez-developer",
   "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

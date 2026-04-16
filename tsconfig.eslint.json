@@ -5,7 +5,15 @@
     "composite": false,
     "declaration": false,
     "incremental": false,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": {
+      "@seopen/types": ["./packages/types/src/index.ts"],
+      "@seopen/fetch": ["./packages/fetch/src/index.ts"],
+      "@seopen/parse": ["./packages/parse/src/index.ts"],
+      "@seopen/scoring": ["./packages/scoring/src/index.ts"],
+      "@seopen/cli": ["./packages/cli/src/index.ts"]
+    }
   },
   "include": ["eslint.config.js", "packages/*/src/**/*.ts", "packages/*/test/**/*.ts"],
   "exclude": ["**/dist/**", "**/node_modules/**", "fixtures/**"]

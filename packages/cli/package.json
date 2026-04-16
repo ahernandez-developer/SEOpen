@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "The seopen command-line interface.",
+  "author": "ahernandez-developer",
   "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
