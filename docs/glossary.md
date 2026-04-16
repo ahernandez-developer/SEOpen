@@ -167,6 +167,18 @@ A PostgreSQL extension that adds a vector data type and similarity search, enabl
 
 The discipline of instrumenting systems so their internal state can be inferred from external signals: structured logs, distributed traces, and metrics. SEOpen uses OpenTelemetry as its cross-language tracing standard.
 
+### llms.txt
+
+A proposed standard ([llmstxt.org](https://llmstxt.org/)) for a Markdown file at `/llms.txt` that gives large-language-model clients a curated, token-efficient summary of a site. Format: H1 title, optional blockquote description, H2 sections grouping Markdown link lists with short inline descriptions. An optional `/llms-full.txt` companion carries the full content of the linked resources for direct ingestion. SEOpen treats `llms.txt` as a scoring input — see [ADR A-013](adr/A-013-llms-txt-and-geo-site-readiness.md) and [`scoring.md` §3.6](scoring.md).
+
+### AI-crawler posture
+
+A site's `robots.txt` allow / deny posture against the tracked roster of AI crawler user-agents (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, …). Distinct from traditional crawler posture because most AI crawlers are newer, less well-known, and silently default to allowed — so scoring rewards **intentional** Allow declarations over silence. See [ADR A-011](adr/A-011-robots-txt-scoring-inputs.md).
+
+### GEO Site Readiness Score
+
+SEOpen's per-domain GEO score — the counterpart to the per-URL GEO Content Score §3.3. Combines AI-crawler posture, `llms.txt` quality, sitemap health, structured-data coverage, and entity clarity into a single 0–100 verdict about how citation-ready a site is _architecturally_, independent of any individual article's quality. Introduced by [ADR A-013](adr/A-013-llms-txt-and-geo-site-readiness.md); formula in [`scoring.md` §3.6](scoring.md).
+
 ---
 
 ## Data & integrations

@@ -31,10 +31,12 @@ The foundation of both SEO and GEO is technical accessibility. If a crawler cann
 - **Status & redirect analysis.** Classifies every HTTP response, flags chains/loops, surfaces canonicalization conflicts (`rel=canonical` vs `robots` vs `sitemap` vs internal linking).
 - **Duplicate content detection.** Near-duplicate detection via shingling/MinHash across the crawled corpus.
 - **Indexability audit.** Validates `robots.txt`, `X-Robots-Tag`, `<meta robots>`, `noindex`, canonical, and sitemap consistency, and surfaces contradictions.
+- **Discovery-artifact audit.** First-class auditing of the site's machine-readable discovery files: `robots.txt` health and AI-crawler posture ([ADR A-011](adr/A-011-robots-txt-scoring-inputs.md)), `sitemap.xml` / `sitemap-index.xml` discoverability, validity, coverage, and stale-entry rate ([ADR A-012](adr/A-012-sitemap-scoring-inputs.md)), and `llms.txt` / `llms-full.txt` presence and structural validity ([ADR A-013](adr/A-013-llms-txt-and-geo-site-readiness.md)). These findings feed both the SEO Score §3.1 and the GEO Site Readiness Score §3.6.
 
 ### Outputs
 
 - A persistent **SEO Score** (0–100) for the domain, with the sub-score decomposition defined in [`scoring.md`](scoring.md).
+- A persistent **GEO Site Readiness Score** (0–100) for the domain ([`scoring.md` §3.6](scoring.md)) — the per-domain counterpart to the per-URL GEO Content Score §3.3.
 - A prioritized **issue backlog** grouped by severity, with one-click drill-down into affected URLs.
 - **Historical trends** for every metric at daily/weekly granularity.
 

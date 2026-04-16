@@ -200,96 +200,26 @@ The project welcomes AI-assisted contributions unconditionally. It also reviews 
 
 ---
 
-## Dev setup (Phase 1+)
+## Development setup
 
-> **Phase 0 note.** No code has been merged yet. The commands below describe the **target** development loop and will become live when Phase 1 begins. If you want to contribute code before then, open a discussion first — you would be defining the project structure rather than contributing to it.
+How to clone the repo, install dependencies, run tests, and exercise the shipped tooling end-to-end lives in its own operational guide so this policy document stays readable.
 
-SEOpen is a single-runtime TypeScript stack. You will need:
+**→ [`docs/development.md`](docs/development.md)** covers prerequisites (Node 20, pnpm 9), the workspace layout, every `pnpm` script, the Golden Rule TDD workflow, coding conventions, troubleshooting, and the end-to-end smoke-test recipe.
 
-- **Node.js ≥ 20** — extraction, analysis, scoring, API gateway, and frontend all ship as TypeScript.
-- **pnpm** — workspace dependency manager.
-- **Docker & Docker Compose** — local PostgreSQL (with pgvector), Redis, and MinIO.
+**→ [`docs/cli.md`](docs/cli.md)** documents the `seopen` CLI surface — subcommands, flags, exit codes, and the roadmap of future subcommands.
 
-```bash
-git clone https://github.com/<org>/seopen.git
-cd seopen
-docker compose up -d              # Postgres + pgvector, Redis, MinIO
-pnpm install                      # pnpm workspaces (extractor, analysis, api, scoring, web, cli)
-pnpm test                         # full suite must stay green
-```
-
-The exact commands will be pinned in `docs/development-setup.md` when Phase 1 opens. Target Time-to-First-Audit from a clean clone is **under five minutes**.
-
-### Running services standalone
-
-You do not need the full stack to develop against a single service. Each workspace package can be booted in isolation against the Docker Compose infrastructure:
+The short version for people who just want to run the thing:
 
 ```bash
-# Extraction worker
-pnpm --filter @seopen/extractor dev
-
-# Analysis worker
-pnpm --filter @seopen/analysis dev
-
-# API gateway
-pnpm --filter @seopen/api dev
-
-# Frontend
-pnpm --filter @seopen/web dev
+git clone https://github.com/ahernandez-developer/SEOpen.git
+cd SEOpen
+pnpm install
+pnpm test       # every package test, node:test + fast-check
+pnpm typecheck  # tsc --build across the workspace
+pnpm lint       # ESLint 9 + typescript-eslint
 ```
 
-### Running the plugin against itself
-
-SEOpen's Phase 1 quality goal is that **its own docs pass its own audit**. Once the auditor is live you will be able to point it at this repository's documentation site and see the SEO + GEO scores for the project's own pages. Regressions in that score are a meaningful review signal.
-
----
-
-## Test layout (Phase 1+)
-
-SEOpen uses two top-level pnpm workspace roots:
-
-- **`packages/`** — libraries and the `seopen` CLI. Every package is `@seopen/<name>`, ESM, ships both `src/` (dev) and `dist/` (build) and exposes a `source` export condition so workspace consumers resolve TypeScript directly during development. The opening Phase 1 slice lives here.
-- **`services/`** — long-running services (API gateway, extraction worker pool, analysis worker pool, Next.js frontend). These land incrementally as Phase 1 continues.
-
-```text
-packages/
-├── types/                TypeScript · Zod schemas shared across every layer
-│   └── test/
-├── fetch/                TypeScript · HTTP client + robots.txt compliance
-│   └── test/
-├── parse/                TypeScript · HTML → PageSignals extraction
-│   └── test/
-├── scoring/              TypeScript · deterministic score engines
-│   └── test/             (property tests for every formula via fast-check)
-└── cli/                  TypeScript · `seopen` Commander.js binary
-    └── test/
-
-services/
-├── extractor/            TypeScript · Crawlee, Puppeteer, Lighthouse       (planned)
-│   └── test/
-├── analysis/             TypeScript · HTML→Markdown, NLP, embeddings        (planned)
-│   └── test/
-├── api/                  TypeScript · Fastify + Zod gateway                 (planned)
-│   └── test/
-└── web/                  TypeScript · Next.js frontend                      (planned)
-    └── test/
-```
-
-- **Backend and shared packages** use the built-in `node:test` runner where possible; Vitest is acceptable for the frontend.
-- **Scoring packages** must include property-based tests (`fast-check`) for every formula — the inputs are continuous and off-by-one errors in thresholds are otherwise invisible.
-- **Provider adapters** use **recorded-response fixtures**, never live API calls, to avoid CI quota burn.
-
-Fixtures shared across packages live at the repo root under `fixtures/`.
-
----
-
-## Coding conventions
-
-- **TypeScript strict mode.** `strict: true` and `exactOptionalPropertyTypes: true` for every package. Optional fields use `?:` and conditional spread (`...(x ? { x } : {})`) rather than assigning `undefined`. Schema validation at every boundary uses Zod.
-- **Pure engines.** Scoring and SARIF-style report generators take their inputs as plain values and never read `process.env` or `fs.*` directly. Environment reads live in dedicated config modules. Filesystem I/O is concentrated at service entrypoints and hook scripts.
-- **English only.** Code, docs, commit messages — all in English. SEOpen is published under an international license; keep it accessible to international contributors.
-- **No suppression markers.** `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `# type: ignore`, `# noqa`, `# nosec` are flagged in review. If you need to suppress a lint, fix the lint instead; if you truly cannot, open an issue explaining why.
-- **Conventional Commits.** `feat(crawler): add depth limit`, `fix(scoring): correct LCP threshold interpolation`, `docs(scoring): worked example for GEO Content Score`, `refactor(api): extract provider adapter interface`, `test(crawler): fixture for SPA rendering`, `chore(deps): bump puppeteer to 22.x`.
+Coding-convention highlights (enforced automatically by ESLint + Prettier + `tsc --strict`): TypeScript strict mode everywhere, pure scoring engines (no environment reads), English only, no lint suppression markers, Conventional Commits, feature-descriptive branch names (`feat/<slug>` / `fix/<slug>` / `docs/<slug>`). The full list lives in [`docs/development.md` §Coding conventions](docs/development.md).
 
 ---
 
