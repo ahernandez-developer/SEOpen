@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+.claude-crap
+pnpm-lock.yaml
+*.tsbuildinfo
+fixtures

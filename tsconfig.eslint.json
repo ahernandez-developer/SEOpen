@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "incremental": false,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  "include": ["eslint.config.js", "packages/*/src/**/*.ts", "packages/*/test/**/*.ts"],
+  "exclude": ["**/dist/**", "**/node_modules/**", "fixtures/**"]
+}
