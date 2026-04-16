@@ -10,18 +10,21 @@ ADRs are the mechanism SEOpen uses to evolve its architecture and scoring method
 
 The ten ADRs below capture the decisions recorded inline in [`../architecture.md` §4.10](../architecture.md) at the time of the Phase 0 foundation freeze. They are the authoritative long-form of that table; if the table and an ADR ever disagree, **the ADR wins** and the table must be corrected.
 
-| Id                                             | Title                                                       | Status   | Date       |
-| ---------------------------------------------- | ----------------------------------------------------------- | -------- | ---------- |
-| [A-001](A-001-single-runtime-nodejs.md)        | Single runtime: Node.js / TypeScript                        | Accepted | 2026-04-16 |
-| [A-002](A-002-bullmq-task-broker.md)           | BullMQ on Redis as the primary task broker                  | Accepted | 2026-04-16 |
-| [A-003](A-003-redis-url-frontier-and-cache.md) | Redis as the URL frontier, cache, and BullMQ backing store  | Accepted | 2026-04-16 |
-| [A-004](A-004-postgres-with-pgvector.md)       | PostgreSQL with pgvector for relational data and embeddings | Accepted | 2026-04-16 |
-| [A-005](A-005-s3-compatible-object-storage.md) | S3-compatible object storage for blobs                      | Accepted | 2026-04-16 |
-| [A-006](A-006-fastify-api-gateway.md)          | Fastify + Zod as the API gateway                            | Accepted | 2026-04-16 |
-| [A-007](A-007-nextjs-web-frontend.md)          | Next.js for the web frontend                                | Accepted | 2026-04-16 |
-| [A-008](A-008-byok-third-party-indexes.md)     | Bring-your-own-key for all third-party indexes              | Accepted | 2026-04-16 |
-| [A-009](A-009-llm-optional-never-required.md)  | LLM calls are optional, never required for scoring          | Accepted | 2026-04-16 |
-| [A-010](A-010-opentelemetry-tracing.md)        | OpenTelemetry for distributed tracing                       | Accepted | 2026-04-16 |
+| Id                                                | Title                                                       | Status   | Date       |
+| ------------------------------------------------- | ----------------------------------------------------------- | -------- | ---------- |
+| [A-001](A-001-single-runtime-nodejs.md)           | Single runtime: Node.js / TypeScript                        | Accepted | 2026-04-16 |
+| [A-002](A-002-bullmq-task-broker.md)              | BullMQ on Redis as the primary task broker                  | Accepted | 2026-04-16 |
+| [A-003](A-003-redis-url-frontier-and-cache.md)    | Redis as the URL frontier, cache, and BullMQ backing store  | Accepted | 2026-04-16 |
+| [A-004](A-004-postgres-with-pgvector.md)          | PostgreSQL with pgvector for relational data and embeddings | Accepted | 2026-04-16 |
+| [A-005](A-005-s3-compatible-object-storage.md)    | S3-compatible object storage for blobs                      | Accepted | 2026-04-16 |
+| [A-006](A-006-fastify-api-gateway.md)             | Fastify + Zod as the API gateway                            | Accepted | 2026-04-16 |
+| [A-007](A-007-nextjs-web-frontend.md)             | Next.js for the web frontend                                | Accepted | 2026-04-16 |
+| [A-008](A-008-byok-third-party-indexes.md)        | Bring-your-own-key for all third-party indexes              | Accepted | 2026-04-16 |
+| [A-009](A-009-llm-optional-never-required.md)     | LLM calls are optional, never required for scoring          | Accepted | 2026-04-16 |
+| [A-010](A-010-opentelemetry-tracing.md)           | OpenTelemetry for distributed tracing                       | Accepted | 2026-04-16 |
+| [A-011](A-011-robots-txt-scoring-inputs.md)       | `robots.txt` as explicit SEO + GEO scoring input            | Accepted | 2026-04-16 |
+| [A-012](A-012-sitemap-scoring-inputs.md)          | `sitemap.xml` as explicit SEO + GEO scoring input           | Accepted | 2026-04-16 |
+| [A-013](A-013-llms-txt-and-geo-site-readiness.md) | `llms.txt` adoption and §3.6 GEO Site Readiness Score       | Accepted | 2026-04-16 |
 
 ---
 

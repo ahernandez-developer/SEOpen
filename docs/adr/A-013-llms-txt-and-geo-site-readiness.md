@@ -17,9 +17,9 @@
 
 An optional companion file `/llms-full.txt` extends the same format with full-content copies of the linked resources, so LLMs can ingest the entire site from a single file when doing so is appropriate.
 
-The standard is **nascent** — adoption is measured in the low thousands of sites as of early 2026 — but it directly addresses a measurable problem with LLM ingestion: HTML sites are expensive to tokenize, full of boilerplate, and rarely optimized for model consumption. `llms.txt` is the first format that targets the *model* as a reader rather than the browser or the search crawler.
+The standard is **nascent** — adoption is measured in the low thousands of sites as of early 2026 — but it directly addresses a measurable problem with LLM ingestion: HTML sites are expensive to tokenize, full of boilerplate, and rarely optimized for model consumption. `llms.txt` is the first format that targets the _model_ as a reader rather than the browser or the search crawler.
 
-SEOpen's current scoring catalog covers per-domain SEO (§3.1), empirical AI visibility (§3.2), and per-URL GEO content (§3.3). There is **no per-domain GEO score** — nothing that asks, holistically, *"is this site architecturally ready to be cited by AI?"* That gap is why A-011 needed a new home for AI-crawler posture and why the sitemap health input from A-012 has an awkward fit today.
+SEOpen's current scoring catalog covers per-domain SEO (§3.1), empirical AI visibility (§3.2), and per-URL GEO content (§3.3). There is **no per-domain GEO score** — nothing that asks, holistically, _"is this site architecturally ready to be cited by AI?"_ That gap is why A-011 needed a new home for AI-crawler posture and why the sitemap health input from A-012 has an awkward fit today.
 
 This ADR fills that gap.
 
@@ -41,13 +41,13 @@ GEO_Site_Readiness = 100 · (
 
 Default weights — initial estimates subject to empirical revision per `CONTRIBUTING.md` §Scoring methodology contributions:
 
-| # | Sub-input | Weight | Source |
-| --- | --- | --- | --- |
-| w1 | AiCrawlerPosture | **0.30** | [A-011](A-011-robots-txt-scoring-inputs.md) |
-| w2 | LlmsTxtQuality | **0.25** | this ADR |
-| w3 | SitemapHealth | **0.20** | [A-012](A-012-sitemap-scoring-inputs.md) |
-| w4 | StructuredDataCoverage | **0.15** | this ADR |
-| w5 | EntityClarity | **0.10** | this ADR |
+| #   | Sub-input              | Weight   | Source                                      |
+| --- | ---------------------- | -------- | ------------------------------------------- |
+| w1  | AiCrawlerPosture       | **0.30** | [A-011](A-011-robots-txt-scoring-inputs.md) |
+| w2  | LlmsTxtQuality         | **0.25** | this ADR                                    |
+| w3  | SitemapHealth          | **0.20** | [A-012](A-012-sitemap-scoring-inputs.md)    |
+| w4  | StructuredDataCoverage | **0.15** | this ADR                                    |
+| w5  | EntityClarity          | **0.10** | this ADR                                    |
 
 Sum: `0.30 + 0.25 + 0.20 + 0.15 + 0.10 = 1.00`. `formula_version: 3.6.0`, `weights_version: default-v1`.
 
@@ -73,7 +73,7 @@ Site-level structured-data signals complement [`../scoring.md`](../scoring.md) �
 
 ### `EntityClarity` sub-input (new)
 
-A measure of how unambiguously the site tells AI systems *what entity it represents*:
+A measure of how unambiguously the site tells AI systems _what entity it represents_:
 
 - `sameAs` links to authoritative external identifiers — Wikipedia, Wikidata, Crunchbase, GitHub, LinkedIn, official social profiles.
 - Consistent brand mentions across the site (name form, spelling).

@@ -50,14 +50,18 @@ Sources its inputs from the content analysis pipeline:
 
 ### Technical Infrastructure sub-score
 
-| Input               | Description                                                             | Contribution |
-| ------------------- | ----------------------------------------------------------------------- | ------------ |
-| Indexability        | Robots / meta / canonical / sitemap consistency.                        | 25%          |
-| Crawlability        | Depth-of-reach from seed, orphan detection, crawl-budget hygiene.       | 20%          |
-| HTTP Health         | Status distribution, redirect chain length, 4xx/5xx ratio.              | 20%          |
-| HTTPS & Security    | TLS validity, mixed-content detection, HSTS, secure cookies.            | 15%          |
-| Duplicate Content   | Shingle-based near-duplicate ratio across the crawled corpus.           | 10%          |
-| Internal Link Graph | PageRank-style equity distribution, link-equity sinks, and orphan rate. | 10%          |
+`formula_version: 3.1.1` · `weights_version: default-v1`.
+
+| Input               | Description                                                                                                                                                                                                    | Contribution |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Indexability        | `robots.txt` health + `<meta robots>` / `X-Robots-Tag` / canonical / sitemap agreement. Decomposition per [ADR A-011](adr/A-011-robots-txt-scoring-inputs.md).                                                 | 25%          |
+| Crawlability        | Sitemap discoverability / validity / URL coverage / stale-entry rate alongside depth-of-reach, orphan detection, and crawl-budget hygiene. Decomposition per [ADR A-012](adr/A-012-sitemap-scoring-inputs.md). | 20%          |
+| HTTP Health         | Status distribution, redirect chain length, 4xx/5xx ratio.                                                                                                                                                     | 20%          |
+| HTTPS & Security    | TLS validity, mixed-content detection, HSTS, secure cookies.                                                                                                                                                   | 15%          |
+| Duplicate Content   | Shingle-based near-duplicate ratio across the crawled corpus.                                                                                                                                                  | 10%          |
+| Internal Link Graph | PageRank-style equity distribution, link-equity sinks, and orphan rate.                                                                                                                                        | 10%          |
+
+The `3.1.0` → `3.1.1` bump is a **patch** revision: the weighted row structure and contributions are unchanged, but the Indexability and Crawlability rows now cite ADRs A-011 and A-012 for their deterministic decomposition. Scores computed under 3.1.0 against sites whose `robots.txt` and `sitemap.xml` health were not formally decomposed remain valid historical data; dashboards show the version alongside each score per §3.4.
 
 ### User Experience sub-score
 
@@ -219,6 +223,10 @@ Each sub-score is a 0–1 value.
 >
 > A 68 lands in the Moderate band. The 30% weight on Fact Interpretability _specifically_ drags the score down, surfacing the correct remediation ("add statistics from primary sources") as the single highest-impact fix.
 
+### Freshness signal sources
+
+The freshness component of the Engagement sub-score (per-URL) takes its timestamp from the most recent of: schema `datePublished`, schema `dateModified`, visible `<time datetime>` elements, and the URL's `<lastmod>` entry in the site's XML sitemap. Sitemap `<lastmod>` is adopted as a peer source per [ADR A-012](adr/A-012-sitemap-scoring-inputs.md) — publishers frequently update sitemap timestamps without touching visible page dates, and the scoring pass takes the most recent signal. The `formula_version` is unchanged; only the source channel widens, reflected through an additional `source_versions` entry (`sitemap: <url>`) per §3.4.
+
 ---
 
 ## 3.4 Scoring provenance & versioning
@@ -242,3 +250,83 @@ No element of the scoring system relies on undocumented proprietary data. Every 
 - Provided by a BYOK integration whose data contract is documented in [`data-integrations.md`](data-integrations.md).
 
 Users are free to re-derive every score from raw inputs if they wish. The scoring code is not, and will not be, a closed differentiator — transparency is the differentiator.
+
+---
+
+## 3.6 GEO Site Readiness Score (per-domain)
+
+The GEO Site Readiness Score is the **per-domain counterpart** to the per-URL §3.3 GEO Content Score. Where §3.3 asks "how citation-worthy is this page?", §3.6 asks "how citation-ready is this site as a whole?" The score is computed once per site using only site-level discovery artifacts and schema signals — no per-URL crawling required beyond what surface signals demand.
+
+Introduced by [ADR A-013](adr/A-013-llms-txt-and-geo-site-readiness.md) and consuming the discovery-artifact decompositions from [ADR A-011](adr/A-011-robots-txt-scoring-inputs.md) (robots.txt) and [ADR A-012](adr/A-012-sitemap-scoring-inputs.md) (sitemap.xml).
+
+### 3.6.1 Formula
+
+```
+GEO_Site_Readiness = 100 · (
+    0.30 · AiCrawlerPosture
+  + 0.25 · LlmsTxtQuality
+  + 0.20 · SitemapHealth
+  + 0.15 · StructuredDataCoverage
+  + 0.10 · EntityClarity
+)
+```
+
+`formula_version: 3.6.0` · `weights_version: default-v1`.
+
+Each sub-score is a 0–1 value.
+
+| Sub-score                    | Weight  | What it measures                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AI-crawler posture**       | **30%** | `robots.txt` allow/deny posture against the tracked roster of AI crawlers (GPTBot, ClaudeBot, anthropic-ai, PerplexityBot, Google-Extended, Applebot-Extended, CCBot, Amazonbot, cohere-ai, ChatGPT-User, OAI-SearchBot, Bytespider). Silence scores neutral (0.7); explicit Allow scores full (1.0); explicit Disallow scores zero. Full decomposition in [A-011](adr/A-011-robots-txt-scoring-inputs.md). |
+| **llms.txt quality**         | **25%** | Presence at `/llms.txt`, structural validity per the [llmstxt.org](https://llmstxt.org/) format (H1 title + H2 sections + link lists), coverage of the site's major information architecture, health of the links it contains, and an optional `/llms-full.txt` quality bonus. Full decomposition in [A-013](adr/A-013-llms-txt-and-geo-site-readiness.md).                                                 |
+| **Sitemap health**           | **20%** | Sitemap discoverability / validity / URL coverage / stale-entry rate. Decomposition reused from the §3.1 Crawlability row per [A-012](adr/A-012-sitemap-scoring-inputs.md).                                                                                                                                                                                                                                 |
+| **Structured data coverage** | **15%** | Site-level `Organization` / `Person` / `WebSite` schema on the homepage, and per-content-type schema coverage (fraction of articles carrying `Article`, products carrying `Product`, etc.) across crawled URLs.                                                                                                                                                                                             |
+| **Entity clarity**           | **10%** | `sameAs` links to authoritative external identifiers (Wikipedia, Wikidata, Crunchbase, GitHub, LinkedIn, official social), consistent brand name across pages, presence of a canonical About page.                                                                                                                                                                                                          |
+
+### 3.6.2 Interpretation bands
+
+Identical thresholds to §3.3 so dashboards can show per-URL and per-site bands on the same scale.
+
+| Score  | Interpretation                                                                                                                                  |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 90–100 | Best-in-class GEO readiness. The site is infrastructurally ready for AI citation.                                                               |
+| 75–89  | Strong. Tactical adjustments (e.g. add missing AI-crawler Allow declarations, publish an llms.txt) recommended.                                 |
+| 60–74  | Moderate. Multiple discovery artifacts need attention; remediation ordered by weight typically produces the biggest gains.                      |
+| 40–59  | Weak. Major discoverability gaps — robots.txt likely silent on AI crawlers, llms.txt absent, sitemap possibly missing or stale.                 |
+| 0–39   | Fails. The site is effectively invisible to AI systems at the infrastructure layer; no content quality can compensate without fixes here first. |
+
+### 3.6.3 Worked example
+
+> A hypothetical site scores as follows:
+>
+> - AI crawler posture = 0.85 (explicit Allow for the five most prominent AI crawlers; silence for the rest)
+> - llms.txt quality = 0.95 (valid, 5 H2 sections matching navigation, 100 % link health, `/llms-full.txt` present)
+> - Sitemap health = 0.92 (valid XML, 98 % URL coverage, 2 % stale-entry rate)
+> - Structured data coverage = 0.75 (Organization + WebSite on homepage, 70 % article coverage)
+> - Entity clarity = 0.90 (Wikipedia + Wikidata + GitHub `sameAs`, consistent brand name, dedicated About page)
+>
+> Final = `100 · (0.30·0.85 + 0.25·0.95 + 0.20·0.92 + 0.15·0.75 + 0.10·0.90) = 100 · (0.255 + 0.2375 + 0.184 + 0.1125 + 0.090) = 87.9`
+>
+> An 87.9 lands in the Strong band. Structured data coverage is the lowest sub-input — the correct remediation is to raise per-content-type schema coverage before touching anything else.
+
+This worked example is the characterization-test pin for the future `scoreGeoSiteReadiness` implementation in `@seopen/scoring`, analogous to the §3.3 "68" pin for `scoreGeoContent`.
+
+### 3.6.4 AI crawler roster
+
+The AI-crawler posture sub-input evaluates `robots.txt` against the following roster. The roster is intentionally versioned alongside `weights_version` so scoring runs are reproducible across crawler-launch cadences — new crawlers join the roster via an ADR-accompanied `weights_version` bump.
+
+| User-agent                                | Provider                     |
+| ----------------------------------------- | ---------------------------- |
+| `GPTBot`                                  | OpenAI                       |
+| `ChatGPT-User`                            | OpenAI (on-demand)           |
+| `OAI-SearchBot`                           | OpenAI (SearchGPT)           |
+| `ClaudeBot`, `claude-web`, `anthropic-ai` | Anthropic                    |
+| `PerplexityBot`, `Perplexity-User`        | Perplexity                   |
+| `Google-Extended`                         | Google (AI training opt-out) |
+| `Applebot-Extended`                       | Apple Intelligence           |
+| `CCBot`                                   | Common Crawl                 |
+| `Amazonbot`                               | Amazon                       |
+| `cohere-ai`                               | Cohere                       |
+| `Bytespider`                              | ByteDance                    |
+
+Changes to this roster — adds, removes, renames — bump `weights_version` on the next §3.6 release.

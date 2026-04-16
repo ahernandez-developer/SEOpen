@@ -28,14 +28,14 @@ SEOpen treats XML sitemaps as **explicit, decomposed inputs** on two axes.
 
 The Crawlability row of the §3.1 sub-score gains the following formal decomposition. The 20 % weight of the row within §3.1 is unchanged; only the internal decomposition is codified.
 
-| Input | Signal |
-| --- | --- |
-| Sitemap discoverability | At least one sitemap is discoverable via (a) `robots.txt` `Sitemap:` directive, (b) `/sitemap.xml`, or (c) `/sitemap_index.xml`. |
-| Sitemap validity | All discovered sitemaps parse under the [sitemaps.org 0.9 XSD](https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd). |
-| Sitemap index resolution | Any `<sitemapindex>` is followed and all nested `<sitemap>` URLs return parseable XML. |
-| URL coverage | Ratio of URLs SEOpen's own crawler reached from the seed to URLs declared in the sitemap. Target ≥ 0.9; low coverage implies either orphan pages (the crawler reached URLs the sitemap omits) or stale sitemaps (the sitemap lists URLs the crawler never reached). |
-| Stale-entry rate | Ratio of sitemap-declared URLs that return 4xx, 5xx, or 3xx-redirect-to-elsewhere when fetched. Target ≤ 0.05. |
-| HTTPS consistency | All sitemap URLs share the canonical HTTPS scheme of the declaring site. |
+| Input                    | Signal                                                                                                                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sitemap discoverability  | At least one sitemap is discoverable via (a) `robots.txt` `Sitemap:` directive, (b) `/sitemap.xml`, or (c) `/sitemap_index.xml`.                                                                                                                                    |
+| Sitemap validity         | All discovered sitemaps parse under the [sitemaps.org 0.9 XSD](https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd).                                                                                                                                           |
+| Sitemap index resolution | Any `<sitemapindex>` is followed and all nested `<sitemap>` URLs return parseable XML.                                                                                                                                                                              |
+| URL coverage             | Ratio of URLs SEOpen's own crawler reached from the seed to URLs declared in the sitemap. Target ≥ 0.9; low coverage implies either orphan pages (the crawler reached URLs the sitemap omits) or stale sitemaps (the sitemap lists URLs the crawler never reached). |
+| Stale-entry rate         | Ratio of sitemap-declared URLs that return 4xx, 5xx, or 3xx-redirect-to-elsewhere when fetched. Target ≤ 0.05.                                                                                                                                                      |
+| HTTPS consistency        | All sitemap URLs share the canonical HTTPS scheme of the declaring site.                                                                                                                                                                                            |
 
 Depth-of-reach, orphan detection, and crawl-budget hygiene (the original Crawlability row text) remain included; the sitemap inputs above sit alongside them.
 
@@ -66,7 +66,7 @@ This is the only site-level (per-domain) reuse of the sitemap signals; all other
 
 ### Negative / trade-offs
 
-- **Sitemap compliance in the wild is uneven.** Many sites ship invalid XML, duplicated entries, or `<lastmod>` values that lie. Scoring must degrade gracefully when any one input is unreliable. The §3.1 row handles this by scoring each input independently; §3.3 handles it by always taking `max()` across freshness sources so a lying sitemap cannot *reduce* a reliable page signal.
+- **Sitemap compliance in the wild is uneven.** Many sites ship invalid XML, duplicated entries, or `<lastmod>` values that lie. Scoring must degrade gracefully when any one input is unreliable. The §3.1 row handles this by scoring each input independently; §3.3 handles it by always taking `max()` across freshness sources so a lying sitemap cannot _reduce_ a reliable page signal.
 - **Very large sitemaps are expensive to fetch and parse.** The implementation must stream-parse large index sitemaps rather than load them entirely into memory. This is an implementation detail called out here as a known constraint.
 - **Legacy signals (`<changefreq>`, `<priority>`) are explicitly ignored.** They are widely misused and Google has repeatedly stated they carry no ranking weight. Scoring them would mislead operators.
 
@@ -77,7 +77,7 @@ This is the only site-level (per-domain) reuse of the sitemap signals; all other
 ## Alternatives considered
 
 - **Skip sitemaps as a scoring input; rely only on crawl reach.** Rejected: the asymmetry between crawler reach and publisher declaration is diagnostically important. A site with comprehensive content but no sitemap is crawler-hostile in a way that silently hurts ranking and GEO visibility.
-- **Trust sitemap `<lastmod>` as the *authoritative* freshness source.** Rejected: sitemap lastmod is trivial to misreport (e.g. the CMS stamps the current time on every build regardless of content change). Using `max()` across sources is a more robust aggregation.
+- **Trust sitemap `<lastmod>` as the _authoritative_ freshness source.** Rejected: sitemap lastmod is trivial to misreport (e.g. the CMS stamps the current time on every build regardless of content change). Using `max()` across sources is a more robust aggregation.
 - **Score `<changefreq>` and `<priority>`.** Rejected: their ranking weight is effectively zero in modern search engines and scoring them would encourage operators to optimize meaningless signals.
 - **Require sitemaps at a specific location only (`/sitemap.xml`).** Rejected: `robots.txt` `Sitemap:` declarations are standard practice; many large sites use non-default paths.
 
