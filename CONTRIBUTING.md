@@ -31,16 +31,16 @@ PRs that ship opaque scoring changes or untested production code will be closed.
 
 ## How to contribute
 
-| You want to... | What to do |
-| :-- | :-- |
-| Fix a typo or doc wording | Open a PR directly. No prior discussion needed. |
-| Clarify or extend a foundation doc | Open a PR. Significant edits need an ADR under `docs/adr/`. |
+| You want to...                       | What to do                                                                                                                                                            |
+| :----------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fix a typo or doc wording            | Open a PR directly. No prior discussion needed.                                                                                                                       |
+| Clarify or extend a foundation doc   | Open a PR. Significant edits need an ADR under `docs/adr/`.                                                                                                           |
 | Propose a scoring methodology change | [Open a discussion](#where-to-get-help) first, then land an ADR + PR following the [Scoring methodology contributions](#scoring-methodology-contributions) checklist. |
-| Add a BYOK provider adapter | [Open a discussion](#where-to-get-help) to align on shape, then follow [Provider adapter contributions](#provider-adapter-contributions). |
-| Fix a bug (Phase 1+) | Open a PR with a failing regression test + the fix. |
-| Propose a new feature (Phase 1+) | Open a discussion or issue **before** writing code so the approach can be aligned. |
-| Land a refactor-only change | File an issue explaining the code-health problem first. Drive-by refactors without a discussion are discouraged. |
-| Ask a question | [Open a discussion](#where-to-get-help) or file an issue with the `question` label. |
+| Add a BYOK provider adapter          | [Open a discussion](#where-to-get-help) to align on shape, then follow [Provider adapter contributions](#provider-adapter-contributions).                             |
+| Fix a bug (Phase 1+)                 | Open a PR with a failing regression test + the fix.                                                                                                                   |
+| Propose a new feature (Phase 1+)     | Open a discussion or issue **before** writing code so the approach can be aligned.                                                                                    |
+| Land a refactor-only change          | File an issue explaining the code-health problem first. Drive-by refactors without a discussion are discouraged.                                                      |
+| Ask a question                       | [Open a discussion](#where-to-get-help) or file an issue with the `question` label.                                                                                   |
 
 Keep PRs focused. One concern per PR. If you need more than one PR for a coordinated change set, open an issue first so the rollout can be tracked.
 
@@ -80,15 +80,15 @@ Apply at least one **type** label to every PR. Add a **scope** label if the chan
 
 Pick **exactly one**:
 
-| Label | When to use |
-| :-- | :-- |
-| `bug` | Fixing broken behavior. PR body must link to a reproducer or show the failing regression test first. |
-| `enhancement` | New feature, new crawler capability, new scoring sub-metric, new CLI flag, new module. |
-| `documentation` | README, `docs/`, `CONTRIBUTING.md`, inline comments, ADRs. No production code. |
-| `scoring` | Any change to a formula, weight, or threshold in [`docs/scoring.md`](docs/scoring.md). Requires an ADR. |
-| `provider` | New or updated BYOK provider adapter (DataForSEO, SerpApi, OpenAI, etc.). |
-| `refactor` | Internal cleanup with no user-visible change. **Only open if a maintainer explicitly asked for it** — see [How to contribute](#how-to-contribute). |
-| `dependencies` | Dependency bumps, lockfile refreshes, Renovate/Dependabot PRs. |
+| Label           | When to use                                                                                                                                        |
+| :-------------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bug`           | Fixing broken behavior. PR body must link to a reproducer or show the failing regression test first.                                               |
+| `enhancement`   | New feature, new crawler capability, new scoring sub-metric, new CLI flag, new module.                                                             |
+| `documentation` | README, `docs/`, `CONTRIBUTING.md`, inline comments, ADRs. No production code.                                                                     |
+| `scoring`       | Any change to a formula, weight, or threshold in [`docs/scoring.md`](docs/scoring.md). Requires an ADR.                                            |
+| `provider`      | New or updated BYOK provider adapter (DataForSEO, SerpApi, OpenAI, etc.).                                                                          |
+| `refactor`      | Internal cleanup with no user-visible change. **Only open if a maintainer explicitly asked for it** — see [How to contribute](#how-to-contribute). |
+| `dependencies`  | Dependency bumps, lockfile refreshes, Renovate/Dependabot PRs.                                                                                     |
 
 Add `breaking-change` **on top of** the base type if the PR forces a major version bump: REST API contract change, scoring `formula_version` reset, provider adapter interface change, database schema migration that is not backward-compatible, etc.
 
@@ -96,25 +96,25 @@ Add `breaking-change` **on top of** the base type if the PR forces a major versi
 
 Add only when the change is narrowly confined. Skip scope labels entirely for cross-cutting work — the type label plus a clear PR body is enough.
 
-| Label | Code it covers |
-| :-- | :-- |
-| `scope:crawler` | Extraction workers, Crawlee, Puppeteer, Lighthouse integration, URL frontier. |
-| `scope:analysis` | Analysis workers, HTML → Markdown pipeline, NLP, embeddings. |
-| `scope:scoring` | Deterministic score engines and the formula implementations. |
-| `scope:api` | Fastify + Zod gateway, auth, RBAC, request validation. |
-| `scope:ui` | Next.js frontend, dashboards, exports. |
-| `scope:providers` | BYOK provider adapters. |
-| `scope:infra` | Docker Compose, Helm charts, CI workflows, release tooling. |
-| `scope:docs` | `docs/`, `README.md`, `CONTRIBUTING.md`. |
+| Label             | Code it covers                                                                |
+| :---------------- | :---------------------------------------------------------------------------- |
+| `scope:crawler`   | Extraction workers, Crawlee, Puppeteer, Lighthouse integration, URL frontier. |
+| `scope:analysis`  | Analysis workers, HTML → Markdown pipeline, NLP, embeddings.                  |
+| `scope:scoring`   | Deterministic score engines and the formula implementations.                  |
+| `scope:api`       | Fastify + Zod gateway, auth, RBAC, request validation.                        |
+| `scope:ui`        | Next.js frontend, dashboards, exports.                                        |
+| `scope:providers` | BYOK provider adapters.                                                       |
+| `scope:infra`     | Docker Compose, Helm charts, CI workflows, release tooling.                   |
+| `scope:docs`      | `docs/`, `README.md`, `CONTRIBUTING.md`.                                      |
 
 ### Meta — apply as needed
 
-| Label | When to use |
-| :-- | :-- |
-| `ai-assisted` | **Required** whenever an AI coding agent wrote any part of the diff. See [AI-assisted PRs welcome](#ai-assisted-prs-welcome). |
-| `good first issue` | **Maintainer-applied** on issues suitable for new contributors. Do not add it to your own PR. |
-| `help wanted` | **Maintainer-applied** to signal a stalled PR that needs a second reviewer. |
-| `question` | For issues, not PRs. If your PR raises an open question, open a discussion instead. |
+| Label              | When to use                                                                                                                   |
+| :----------------- | :---------------------------------------------------------------------------------------------------------------------------- |
+| `ai-assisted`      | **Required** whenever an AI coding agent wrote any part of the diff. See [AI-assisted PRs welcome](#ai-assisted-prs-welcome). |
+| `good first issue` | **Maintainer-applied** on issues suitable for new contributors. Do not add it to your own PR.                                 |
+| `help wanted`      | **Maintainer-applied** to signal a stalled PR that needs a second reviewer.                                                   |
+| `question`         | For issues, not PRs. If your PR raises an open question, open a discussion instead.                                           |
 
 If a label you need does not exist yet, mention it in the PR body and the maintainer will create it — do not block on missing labels.
 
@@ -246,25 +246,40 @@ SEOpen's Phase 1 quality goal is that **its own docs pass its own audit**. Once 
 
 ## Test layout (Phase 1+)
 
+SEOpen uses two top-level pnpm workspace roots:
+
+- **`packages/`** — libraries and the `seopen` CLI. Every package is `@seopen/<name>`, ESM, ships both `src/` (dev) and `dist/` (build) and exposes a `source` export condition so workspace consumers resolve TypeScript directly during development. The opening Phase 1 slice lives here.
+- **`services/`** — long-running services (API gateway, extraction worker pool, analysis worker pool, Next.js frontend). These land incrementally as Phase 1 continues.
+
 ```text
-services/
-├── extractor/            TypeScript · Crawlee, Puppeteer, Lighthouse
-│   └── tests/
-├── analysis/             TypeScript · HTML→Markdown, NLP, embeddings
-│   └── tests/
-├── api/                  TypeScript · Fastify + Zod gateway
-│   └── tests/
+packages/
+├── types/                TypeScript · Zod schemas shared across every layer
+│   └── test/
+├── fetch/                TypeScript · HTTP client + robots.txt compliance
+│   └── test/
+├── parse/                TypeScript · HTML → PageSignals extraction
+│   └── test/
 ├── scoring/              TypeScript · deterministic score engines
-│   └── tests/            (property tests for every formula)
-└── web/                  TypeScript · Next.js frontend
-    └── tests/
+│   └── test/             (property tests for every formula via fast-check)
+└── cli/                  TypeScript · `seopen` Commander.js binary
+    └── test/
+
+services/
+├── extractor/            TypeScript · Crawlee, Puppeteer, Lighthouse       (planned)
+│   └── test/
+├── analysis/             TypeScript · HTML→Markdown, NLP, embeddings        (planned)
+│   └── test/
+├── api/                  TypeScript · Fastify + Zod gateway                 (planned)
+│   └── test/
+└── web/                  TypeScript · Next.js frontend                      (planned)
+    └── test/
 ```
 
 - **Backend and shared packages** use the built-in `node:test` runner where possible; Vitest is acceptable for the frontend.
 - **Scoring packages** must include property-based tests (`fast-check`) for every formula — the inputs are continuous and off-by-one errors in thresholds are otherwise invisible.
 - **Provider adapters** use **recorded-response fixtures**, never live API calls, to avoid CI quota burn.
 
-Exact layout will be finalized when Phase 1 opens.
+Fixtures shared across packages live at the repo root under `fixtures/`.
 
 ---
 
@@ -289,7 +304,7 @@ Documentation is not a second-class contribution. It is treated with the same re
 Style notes:
 
 - Write in **clear, complete sentences**, not bullet-point stubs. Tables, lists, and diagrams supplement prose; they do not replace it.
-- Avoid marketing voice. "SEOpen measures *X* by computing *Y*" beats "SEOpen's powerful, cutting-edge *X* engine delivers unmatched *Y*."
+- Avoid marketing voice. "SEOpen measures _X_ by computing _Y_" beats "SEOpen's powerful, cutting-edge _X_ engine delivers unmatched _Y_."
 - Reference other docs with relative links, not absolute URLs.
 - Keep line-lengths reasonable — no hard wrap, but do not produce 400-character lines either.
 
@@ -328,7 +343,7 @@ Requirements for a scoring change to be considered:
 
 > **Version bumps, `CHANGELOG.md` entries, git tags, and container publishes are the maintainer's responsibility — not contributors'.**
 >
-> Opening a PR is the end of the contributor workflow. Please **do not** edit the version field in `package.json` / `pyproject.toml`, add a new section to `CHANGELOG.md`, or run any release script in your PR. Describe the change in your PR body (the *what* and the *why*) and the maintainer will curate release notes when cutting the next version.
+> Opening a PR is the end of the contributor workflow. Please **do not** edit the version field in `package.json` / `pyproject.toml`, add a new section to `CHANGELOG.md`, or run any release script in your PR. Describe the change in your PR body (the _what_ and the _why_) and the maintainer will curate release notes when cutting the next version.
 
 The exact release tooling will be wired up in Phase 1. Until then, releases do not exist.
 
