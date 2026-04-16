@@ -8,7 +8,7 @@ This document captures the non-speculative architectural decisions that govern t
 
 ## 4.1 Design principles
 
-1. **Single runtime.** Node.js / TypeScript is the sole core runtime. Extraction, analysis, scoring, the API gateway, workers, and the CLI all ship as TypeScript. This is a deliberate reversal of the polyglot stance in the early foundation draft — see [A-001](adr/A-001-single-runtime-nodejs.md) for the full rationale. Polyglot services may be reintroduced later via ADR if a specific workload demonstrably requires it.
+1. **Single runtime.** Node.js / TypeScript is the sole core runtime. Extraction, analysis, scoring, the API gateway, workers, and the CLI all ship as TypeScript. See [A-001](adr/A-001-single-runtime-nodejs.md) for the full rationale and the rejected polyglot alternatives. A second runtime may be reintroduced later via ADR if a specific workload demonstrably requires it.
 2. **Queue-first communication.** Services never call each other synchronously across a network boundary. All inter-service traffic flows through a message broker so that failure modes are decoupled.
 3. **Deterministic core + non-deterministic leaves.** The scoring engine is deterministic and reproducible. LLM calls and headless browsers are isolated at the leaves and always produce structured, stored artifacts (Markdown, JSON) before feeding deterministic scoring.
 4. **Horizontal scale from day one.** Even the single-node deployment runs every service as if it could be one of N — so growing the fleet is a configuration change, not a refactor.
@@ -18,22 +18,22 @@ This document captures the non-speculative architectural decisions that govern t
 
 ## 4.2 The runtime choice: Node.js / TypeScript
 
-A single runtime was not a foregone conclusion. The early foundation draft assumed a polyglot stack — Node.js for JavaScript rendering, Python for NLP and scoring — because that matched the mental model of enterprise SEO tooling. Before a single line of code was merged, that decision was revisited and reversed. The rejected polyglot path is documented for the record in [A-001](adr/A-001-single-runtime-nodejs.md).
+SEOpen's core runs on a single runtime. Polyglot alternatives were examined during the foundation phase; the analysis and the rejected options are recorded in [A-001](adr/A-001-single-runtime-nodejs.md).
 
 The tight reasoning for Node.js / TypeScript as the sole core runtime:
 
-- **Extraction is already Node-native.** Modern sites are React/Vue/Angular/Next.js SPAs whose final DOM exists only after JavaScript execution. **Crawlee** brings production-grade auto-scaling, session management, proxy rotation, and anti-bot handling; **Puppeteer / Playwright** drive headless Chromium with first-class lifecycle control; **Lighthouse** itself is a Node.js library. Any other runtime would be an awkward subprocess dance around this fleet.
+- **Extraction is Node-native.** Modern sites are React/Vue/Angular/Next.js SPAs whose final DOM exists only after JavaScript execution. **Crawlee** brings production-grade auto-scaling, session management, proxy rotation, and anti-bot handling; **Puppeteer / Playwright** drive headless Chromium with first-class lifecycle control; **Lighthouse** itself is a Node.js library. Any other runtime would be an awkward subprocess dance around this fleet.
 - **The analysis pipeline is well-served in TypeScript.** HTML → Markdown has a mature Node toolchain: `@mozilla/readability` strips boilerplate, `unified` + `rehype-remark` converts structured content, `turndown` handles the long tail. These produce exactly the clean Markdown the LLM semantic pass consumes.
-- **Scoring is deterministic arithmetic.** Every formula in [`scoring.md`](scoring.md) is a weighted sum of sub-scores that reduce to counts, ratios, and cosine similarities. TypeScript with strict typing expresses these formulas as cleanly as any scientific-Python stack, and the outputs are reproducible by definition.
-- **Embeddings run in-process.** `@xenova/transformers` executes sentence-transformer models (MiniLM, BGE, GTE families) on top of ONNX Runtime with no Python dependency. For the self-host / laptop-first persona this is fast enough. Large-fleet operators who need GPU-batched embeddings can plug in a sidecar embedding service later — an adapter boundary that is orthogonal to the core runtime choice.
-- **LLM APIs are first-class in Node.** `@anthropic-ai/sdk`, `openai`, and equivalent providers ship typed SDKs with streaming, tool-use, and structured-output support. Nothing in the semantic analysis layer benefits from running in Python.
-- **Type safety crosses every seam.** API schemas, queue message shapes, scoring inputs/outputs, and the Next.js frontend share the same TypeScript types. There is no Pydantic ↔ Zod translation layer because Zod lives on both sides of every boundary.
+- **Scoring is deterministic arithmetic.** Every formula in [`scoring.md`](scoring.md) is a weighted sum of sub-scores that reduce to counts, ratios, and cosine similarities. TypeScript with strict typing expresses these formulas cleanly and reproducibly.
+- **Embeddings run in-process.** `@xenova/transformers` executes sentence-transformer models (MiniLM, BGE, GTE families) on top of ONNX Runtime. For the self-host / laptop-first persona this is fast enough. Large-fleet operators who need GPU-batched embeddings can plug in a sidecar embedding service later — an adapter boundary that is orthogonal to the core runtime choice.
+- **LLM APIs are first-class in Node.** `@anthropic-ai/sdk`, `openai`, and equivalent providers ship typed SDKs with streaming, tool-use, and structured-output support; the semantic analysis layer has no cross-runtime cost.
+- **Type safety crosses every seam.** API schemas, queue message shapes, scoring inputs/outputs, and the Next.js frontend share the same TypeScript types. Zod lives on both sides of every boundary, so there is no schema translation layer to maintain.
 - **One runtime, one deployment story.** One `package.json` (or workspace thereof), one Dockerfile family, one linter, one test runner, one CI configuration. The [roadmap.md](roadmap.md) Phase 1 quality gate "first end-to-end audit under five minutes" is structurally easier to hit with a single runtime.
 
 ### What this trades away
 
-- **Advanced Python ML ecosystem.** If SEOpen ever wants spaCy-grade dependency parsing or native PyTorch-backed GPU batch scoring, that can return via a purpose-built sidecar service and a dedicated ADR. The deterministic core stays Node-only.
-- **Academic-research lineage.** Most published IR / GEO literature ships reference code in Python. Reimplementing an algorithm in TypeScript is usually a day of work; accepted as cost of doing business.
+- **Heavy native ML libraries.** Workloads that demand GPU-batched scientific computing, research-grade linguistic analysis (dependency parsing, coreference resolution), or other capabilities found primarily in dedicated ML runtimes are out of scope for the core. If a future workload genuinely requires them, a sidecar service and a new ADR can introduce an extra runtime behind an adapter; the deterministic core stays single-runtime.
+- **Academic-research lineage.** Much published IR / GEO literature ships reference implementations in non-TypeScript languages. Adopting an algorithm is typically a day of porting; accepted as cost of doing business.
 
 ### The seam between services
 

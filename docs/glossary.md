@@ -101,7 +101,7 @@ The sub-score inside the GEO Content Score (weighted at 30%) that measures how r
 ## Architecture & systems
 
 ### Single-runtime architecture
-An architectural style in which every core service shares the same language runtime. SEOpen's core is Node.js / TypeScript end-to-end — extraction, analysis, scoring, API, workers, and the web frontend all ship as TypeScript. See [`architecture.md`](architecture.md) §4.2 and [ADR A-001](adr/A-001-single-runtime-nodejs.md). Polyglot was considered and rejected before any code was merged.
+An architectural style in which every core service shares the same language runtime. SEOpen's core is Node.js / TypeScript end-to-end — extraction, analysis, scoring, API, workers, and the web frontend all ship as TypeScript. See [`architecture.md`](architecture.md) §4.2 and [ADR A-001](adr/A-001-single-runtime-nodejs.md) for the decision and the rejected alternatives.
 
 ### URL frontier
 The distributed queue of URLs that have been discovered but not yet crawled. In SEOpen, implemented in Redis with Bloom-filter-based deduplication and per-domain rate limiting. See [`architecture.md`](architecture.md) §4.4.
@@ -119,7 +119,7 @@ A web browser (typically Chromium via Puppeteer or Playwright) running without a
 A Node.js web scraping and browser automation framework. Provides auto-scaling, session management, proxy rotation, and anti-bot handling. SEOpen's primary extraction library.
 
 ### HTML → Markdown toolchain
-The libraries SEOpen uses to convert rendered HTML into clean Markdown suitable for LLM ingestion and deterministic scoring. Primary stack: [`@mozilla/readability`](https://github.com/mozilla/readability) (strip boilerplate, identify the main article), [`unified`](https://unifiedjs.com/) + [`rehype-remark`](https://github.com/rehypejs/rehype-remark) (structured conversion), and [`turndown`](https://github.com/mixmark-io/turndown) (long-tail HTML patterns). All Node-native; no Python pipeline involved.
+The libraries SEOpen uses to convert rendered HTML into clean Markdown suitable for LLM ingestion and deterministic scoring. Primary stack: [`@mozilla/readability`](https://github.com/mozilla/readability) (strip boilerplate, identify the main article), [`unified`](https://unifiedjs.com/) + [`rehype-remark`](https://github.com/rehypejs/rehype-remark) (structured conversion), and [`turndown`](https://github.com/mixmark-io/turndown) (long-tail HTML patterns). All run inside the single TypeScript runtime.
 
 ### BullMQ
 A distributed task queue library for Node.js backed by Redis. SEOpen's primary task broker across extraction **and** analysis — see [ADR A-002](adr/A-002-bullmq-task-broker.md).
