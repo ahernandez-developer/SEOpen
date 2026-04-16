@@ -17,10 +17,10 @@ The project's *ideas* become publicly legible and contributable.
 - [x] Foundation documentation set complete under `docs/` (this document is part of that set).
 - [x] `LICENSE` added to the repository root.
 - [x] `CONTRIBUTING.md` published and linked from the README.
-- [ ] Initial GitHub issue templates.
-- [ ] Public Discord or GitHub Discussions space open.
-- [ ] First ADR directory (`docs/adr/`) with the decisions from [`architecture.md`](architecture.md) §4.10 as individually dated records.
-- [ ] `CODE_OF_CONDUCT.md` adopted.
+- [ ] Initial GitHub issue templates. *(descoped from Phase 0; will land alongside Phase 1 if demand materializes.)*
+- [ ] Public Discord or GitHub Discussions space open. *(descoped from Phase 0; GitHub Issues / private CoC channel cover the minimum for now.)*
+- [x] First ADR directory (`docs/adr/`) with the decisions from [`architecture.md`](architecture.md) §4.10 as individually dated records.
+- [x] `CODE_OF_CONDUCT.md` adopted.
 
 **Out of scope for Phase 0:** any code. The phase ends when the foundation documentation is stable and the project is ready to accept its first contributions.
 

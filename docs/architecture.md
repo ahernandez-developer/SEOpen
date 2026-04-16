@@ -1,14 +1,14 @@
 # Architecture
 
-> SEOpen is a **polyglot microservices platform** designed to run on a single laptop (Docker Compose) or a horizontally scaled fleet (Kubernetes) without architectural rewrites.
+> SEOpen is a **single-runtime microservices platform** built on Node.js / TypeScript, designed to run on a single laptop (Docker Compose) or a horizontally scaled fleet (Kubernetes) without architectural rewrites.
 
-This document captures the non-speculative architectural decisions that govern the codebase before a single line is merged. It is the authoritative reference for any future implementation work; deviations should be discussed in ADRs (Architecture Decision Records) rather than by silent drift.
+This document captures the non-speculative architectural decisions that govern the codebase before a single line is merged. It is the authoritative reference for any future implementation work; deviations should be discussed in ADRs (Architecture Decision Records) rather than by silent drift. Every decision in §4.10 has a long-form ADR under [`adr/`](adr/).
 
 ---
 
 ## 4.1 Design principles
 
-1. **Polyglot by necessity, not by vanity.** Node.js and Python each have irreplaceable strengths — JavaScript rendering and data/ML respectively — so both languages are first-class citizens. No other languages are in-scope for the core stack.
+1. **Single runtime.** Node.js / TypeScript is the sole core runtime. Extraction, analysis, scoring, the API gateway, workers, and the CLI all ship as TypeScript. See [A-001](adr/A-001-single-runtime-nodejs.md) for the full rationale and the rejected polyglot alternatives. A second runtime may be reintroduced later via ADR if a specific workload demonstrably requires it.
 2. **Queue-first communication.** Services never call each other synchronously across a network boundary. All inter-service traffic flows through a message broker so that failure modes are decoupled.
 3. **Deterministic core + non-deterministic leaves.** The scoring engine is deterministic and reproducible. LLM calls and headless browsers are isolated at the leaves and always produce structured, stored artifacts (Markdown, JSON) before feeding deterministic scoring.
 4. **Horizontal scale from day one.** Even the single-node deployment runs every service as if it could be one of N — so growing the fleet is a configuration change, not a refactor.
@@ -16,27 +16,28 @@ This document captures the non-speculative architectural decisions that govern t
 
 ---
 
-## 4.2 The polyglot decision: Node.js vs. Python
+## 4.2 The runtime choice: Node.js / TypeScript
 
-Both ecosystems have mature web-scraping lineages. Neither is strictly superior. The split is chosen by matching each service to the strengths of its runtime.
+SEOpen's core runs on a single runtime. Polyglot alternatives were examined during the foundation phase; the analysis and the rejected options are recorded in [A-001](adr/A-001-single-runtime-nodejs.md).
 
-### Node.js is used where the workload is JavaScript rendering
+The tight reasoning for Node.js / TypeScript as the sole core runtime:
 
-- Modern sites are React/Vue/Angular/Next.js SPAs whose final DOM exists only after JavaScript execution. Running a headless browser from Node.js means you execute JavaScript in its native runtime, with immediate access to Chrome DevTools Protocol primitives.
-- **Crawlee** provides production-grade auto-scaling, session management, proxy rotation, and anti-bot handling out of the box — roughly 6–12 months of work if built from scratch.
-- **Puppeteer / Playwright** give direct control over headless Chromium with tight memory and lifecycle management.
-- **Lighthouse** itself is a Node.js library; driving it from Node is a first-class path, driving it from Python is an awkward subprocess dance.
+- **Extraction is Node-native.** Modern sites are React/Vue/Angular/Next.js SPAs whose final DOM exists only after JavaScript execution. **Crawlee** brings production-grade auto-scaling, session management, proxy rotation, and anti-bot handling; **Puppeteer / Playwright** drive headless Chromium with first-class lifecycle control; **Lighthouse** itself is a Node.js library. Any other runtime would be an awkward subprocess dance around this fleet.
+- **The analysis pipeline is well-served in TypeScript.** HTML → Markdown has a mature Node toolchain: `@mozilla/readability` strips boilerplate, `unified` + `rehype-remark` converts structured content, `turndown` handles the long tail. These produce exactly the clean Markdown the LLM semantic pass consumes.
+- **Scoring is deterministic arithmetic.** Every formula in [`scoring.md`](scoring.md) is a weighted sum of sub-scores that reduce to counts, ratios, and cosine similarities. TypeScript with strict typing expresses these formulas cleanly and reproducibly.
+- **Embeddings run in-process.** `@xenova/transformers` executes sentence-transformer models (MiniLM, BGE, GTE families) on top of ONNX Runtime. For the self-host / laptop-first persona this is fast enough. Large-fleet operators who need GPU-batched embeddings can plug in a sidecar embedding service later — an adapter boundary that is orthogonal to the core runtime choice.
+- **LLM APIs are first-class in Node.** `@anthropic-ai/sdk`, `openai`, and equivalent providers ship typed SDKs with streaming, tool-use, and structured-output support; the semantic analysis layer has no cross-runtime cost.
+- **Type safety crosses every seam.** API schemas, queue message shapes, scoring inputs/outputs, and the Next.js frontend share the same TypeScript types. Zod lives on both sides of every boundary, so there is no schema translation layer to maintain.
+- **One runtime, one deployment story.** One `package.json` (or workspace thereof), one Dockerfile family, one linter, one test runner, one CI configuration. The [roadmap.md](roadmap.md) Phase 1 quality gate "first end-to-end audit under five minutes" is structurally easier to hit with a single runtime.
 
-### Python is used where the workload is data, NLP, and ML
+### What this trades away
 
-- The entire Python data ecosystem (NumPy, pandas, scikit-learn, spaCy, sentence-transformers, LangChain, …) lives here. Reimplementing TF-IDF, embedding similarity, or entity recognition in Node is possible but strictly inferior.
-- **FastAPI** provides a production-grade async API layer with Pydantic-driven schema validation — the right choice for the public-facing REST interface.
-- **Celery** is the de facto task queue for Python and integrates cleanly with RabbitMQ/Redis.
-- **Crawl4AI / Firecrawl / BeautifulSoup** handle HTML → clean Markdown conversion optimized for LLM token efficiency.
+- **Heavy native ML libraries.** Workloads that demand GPU-batched scientific computing, research-grade linguistic analysis (dependency parsing, coreference resolution), or other capabilities found primarily in dedicated ML runtimes are out of scope for the core. If a future workload genuinely requires them, a sidecar service and a new ADR can introduce an extra runtime behind an adapter; the deterministic core stays single-runtime.
+- **Academic-research lineage.** Much published IR / GEO literature ships reference implementations in non-TypeScript languages. Adopting an algorithm is typically a day of porting; accepted as cost of doing business.
 
-### The seam between them
+### The seam between services
 
-The seam is always a **message broker**, never a direct HTTP call. A Node.js extraction worker publishes a message containing the rendered DOM (and pointers to blob-stored artifacts like raw HTML and Lighthouse JSON); Python analysis workers consume from that queue. This makes the polyglot split invisible to the rest of the system and trivially replaceable if future needs push a service to a different runtime.
+The seam is still a **message broker**, never a direct HTTP call. An extraction worker publishes a message containing pointers to blob-stored artifacts (raw HTML, Lighthouse JSON); analysis workers consume from that queue and persist scored results. The queue boundary survives unchanged if a future ADR ever reintroduces a non-Node worker — that is the insurance premium we pay for queue-first design (principle §4.1.2).
 
 ---
 
@@ -50,7 +51,7 @@ The seam is always a **message broker**, never a direct HTTP call. A Node.js ext
                                       │  HTTPS
                        ┌──────────────▼──────────────┐
                        │         API Gateway         │
-                       │   Python · FastAPI · REST   │
+                       │  Node · Fastify · Zod · REST │
                        │   Auth · RBAC · rate-limit  │
                        └──────┬─────────┬────────────┘
                               │         │
@@ -58,16 +59,16 @@ The seam is always a **message broker**, never a direct HTTP call. A Node.js ext
                               │         │
            ┌──────────────────▼─┐    ┌──▼────────────────────────┐
            │  Task Broker       │    │      PostgreSQL            │
-           │  RabbitMQ / BullMQ │    │  (users, projects, scores) │
+           │  BullMQ · Redis    │    │  (users, projects, scores) │
            └────┬─────────┬─────┘    └────────────────────────────┘
                 │         │
    ┌────────────▼──┐   ┌──▼────────────────────────┐
    │  Extraction   │   │  Analysis & Scoring        │
    │  Workers      │   │  Workers                   │
-   │  Node · TS    │   │  Python · Celery           │
-   │  Crawlee      │   │  Crawl4AI / NLP / LLM      │
+   │  Node · TS    │   │  Node · TS                 │
+   │  Crawlee      │   │  Readability / unified     │
    │  Puppeteer    │   │  Deterministic scoring     │
-   │  Lighthouse   │   │                            │
+   │  Lighthouse   │   │  @xenova/transformers · LLM│
    └──────┬────────┘   └──────┬─────────────────────┘
           │                   │
           │ raw HTML /         │ embeddings /
@@ -81,22 +82,22 @@ The seam is always a **message broker**, never a direct HTTP call. A Node.js ext
                        ┌──────────────────────┐
                        │         Redis        │
                        │  URL frontier · cache │
-                       │  rate-limit counters  │
+                       │  rate-limit · BullMQ  │
                        └──────────────────────┘
 ```
 
 ### Service responsibilities
 
-| Service | Language | Runs as | Responsibilities |
+| Service | Runtime | Runs as | Responsibilities |
 | --- | --- | --- | --- |
 | **Web Frontend** | TypeScript (Next.js) | Long-running web server | Dashboards, project config UI, report rendering, exports. Server-side rendering for first-byte performance. |
-| **API Gateway** | Python (FastAPI) | Long-running web server | Auth (JWT/OAuth), RBAC, request validation, rate limiting, enqueue jobs, aggregate read-only queries. |
-| **Extraction Workers** | Node.js / TypeScript | Auto-scaled pool | Pull crawl tasks, drive headless browsers, run Lighthouse, persist raw HTML + Lighthouse JSON to object storage, emit analysis tasks. |
-| **Analysis Workers** | Python (Celery) | Auto-scaled pool | Pull analysis tasks, transform HTML → Markdown, compute deterministic scores, run LLM-backed semantic analyses, persist scores. |
-| **Scheduler** | Python | Long-running | Fires time-based runs (daily crawl, weekly GEO sweep) onto the broker. |
-| **Task Broker** | RabbitMQ (primary) | Infra | Routes tasks between services with durable queues, dead-letter queues, and priority classes. |
-| **Redis** | Redis | Infra | URL frontier (sets / bloom filters), per-domain rate limits, ephemeral caches, session stores. |
-| **PostgreSQL** | PostgreSQL | Infra | Source of truth for users, projects, scores, historical trends, audit log. |
+| **API Gateway** | TypeScript (Fastify + Zod) | Long-running web server | Auth (JWT/OAuth), RBAC, Zod-validated requests, rate limiting, enqueue jobs, aggregate read-only queries. |
+| **Extraction Workers** | TypeScript (Crawlee / Puppeteer) | Auto-scaled pool | Pull crawl tasks, drive headless browsers, run Lighthouse, persist raw HTML + Lighthouse JSON to object storage, emit analysis tasks. |
+| **Analysis Workers** | TypeScript | Auto-scaled pool | Pull analysis tasks, transform HTML → Markdown via `@mozilla/readability` + `unified` / `rehype-remark`, compute deterministic scores, run LLM-backed semantic analyses, persist scores. |
+| **Scheduler** | TypeScript | Long-running | Fires time-based runs (daily crawl, weekly GEO sweep) onto the broker. |
+| **Task Broker** | BullMQ on Redis | Infra | Delayed, prioritized, retryable job queues with dead-letter semantics. See [A-002](adr/A-002-bullmq-task-broker.md) for why BullMQ replaced the original RabbitMQ choice. |
+| **Redis** | Redis | Infra | URL frontier (sets / bloom filters), per-domain rate limits, ephemeral caches, session stores, BullMQ backing store. |
+| **PostgreSQL** | PostgreSQL + pgvector | Infra | Source of truth for users, projects, scores, historical trends, audit log, and embedding vectors. |
 | **Object Storage** | S3-compatible (MinIO for self-host) | Infra | Raw HTML, Markdown exports, Lighthouse JSON, PDF reports. |
 
 ---
@@ -150,7 +151,7 @@ Stages 1–3 and 6 are **deterministic** and must succeed without any external L
 Observability is not an afterthought. Every service is instrumented from day one.
 
 - **Structured logs.** JSON logs with correlation IDs propagated from the API gateway through every worker. Aggregated via Loki or the user's logging stack of choice.
-- **Traces.** OpenTelemetry traces on every request and every task. Distributed tracing spans crossing the Node ↔ Python boundary via W3C trace context propagated through the broker headers.
+- **Traces.** OpenTelemetry traces on every request and every task. W3C trace context propagates through the BullMQ job payloads so every span from API → workers → provider calls composes into a single distributed trace.
 - **Metrics.** Prometheus metrics exported by every service: request latencies, queue depths, worker saturation, crawl-rate-vs-budget, LLM cost per project.
 - **Alerts.** Ship a default Prometheus alert bundle covering the obvious failure modes: queue backlog growth, worker crash loops, rising 5xx rates, sudden LLM cost spikes.
 - **Cost attribution.** Every LLM or BYOK API call is tagged with `project_id` so operators can see exactly where their credits went.
@@ -164,7 +165,7 @@ The architecture supports two deployment shapes without rewrites.
 ### Single-node (Docker Compose)
 
 - One `docker-compose.yml` brings up every service.
-- PostgreSQL, Redis, RabbitMQ, and MinIO run locally.
+- PostgreSQL (with pgvector), Redis, and MinIO run locally.
 - Extraction and analysis workers run as single replicas that auto-scale CPU usage but not instance count.
 - Target Time-to-First-Value: **under 5 minutes from `git clone` to first successful audit.**
 
@@ -172,7 +173,7 @@ The architecture supports two deployment shapes without rewrites.
 
 - Helm charts deploy the same services as multi-replica Deployments.
 - Extraction and analysis workers auto-scale based on queue depth, not CPU.
-- PostgreSQL, Redis, RabbitMQ, and object storage are externalized to managed services of the operator's choice.
+- PostgreSQL (with pgvector), Redis, and object storage are externalized to managed services of the operator's choice.
 - HorizontalPodAutoscaler targets queue-depth custom metrics, not CPU saturation.
 
 ---
@@ -182,26 +183,26 @@ The architecture supports two deployment shapes without rewrites.
 - **Secrets handling.** No credential is ever committed. Deployments use `.env` files with strict permissions or a KMS-backed secret store; the choice is left to the operator.
 - **BYOK credential isolation.** Third-party API keys (DataForSEO, OpenAI, etc.) are encrypted at rest with a project-scoped key. Workers fetch them just-in-time and never log them.
 - **Tenant isolation.** Project-level RBAC is enforced at the API gateway and the query layer.
-- **Supply chain.** Locked dependency versions (`package-lock.json`, `poetry.lock`), automated Dependabot/Renovate updates, pinned Docker base images, reproducible builds.
+- **Supply chain.** Locked dependency versions (`pnpm-lock.yaml` / `package-lock.json`), automated Dependabot/Renovate updates, pinned Docker base images, reproducible builds.
 - **Responsible crawling.** Default configuration respects `robots.txt`, sets a clear `User-Agent` string, enforces conservative rate limits, and exposes a public opt-out mechanism. SEOpen is not a stealth scraper and will not ship bypass-by-default features.
 
 ---
 
-## 4.10 Architectural decisions recorded here (ADR-lite)
+## 4.10 Architectural decisions (ADR index)
 
-These are binding decisions. They live here instead of a dedicated ADR folder until the codebase exists.
+These are binding decisions. Long-form records live under [`adr/`](adr/); this table is the summary index. Whenever an ADR is added, superseded, or deprecated, both this table and [`adr/README.md`](adr/README.md) update in the same PR. If the two ever disagree, the ADR wins.
 
 | # | Decision | Status | Rationale |
 | --- | --- | --- | --- |
-| A-001 | Polyglot: Node.js for extraction, Python for analysis | Accepted | Match runtime to workload; see §4.2. |
-| A-002 | RabbitMQ as the primary task broker | Accepted | Durable queues, priority support, mature tooling. Redis Pub/Sub is insufficient. |
-| A-003 | Redis as the URL frontier & cache | Accepted | Speed and TTL semantics. No persistence required for frontier. |
-| A-004 | PostgreSQL + pgvector for relational + embeddings | Accepted | Avoids a second datastore until scale forces one. |
-| A-005 | S3-compatible object storage for blobs | Accepted | Portable across MinIO / AWS / R2 / B2. |
-| A-006 | FastAPI as the API gateway | Accepted | Async, Pydantic-native, best fit with the Python analysis stack. |
-| A-007 | Next.js for the web frontend | Accepted | SSR, strong ecosystem, comfortable for contributing developers. |
-| A-008 | BYOK for all third-party indexes | Accepted | Explicit non-goal to replicate proprietary indexes. |
-| A-009 | LLM calls optional, never required for scoring | Accepted | Keeps deterministic core functional offline; degrades gracefully. |
-| A-010 | OpenTelemetry for distributed tracing | Accepted | Cross-language standard; avoids vendor lock-in. |
+| [A-001](adr/A-001-single-runtime-nodejs.md) | Single runtime: Node.js / TypeScript | Accepted | One runtime across extraction, analysis, scoring, API, CLI, frontend. See §4.2. |
+| [A-002](adr/A-002-bullmq-task-broker.md) | BullMQ on Redis as the primary task broker | Accepted | Durable, prioritized, retryable jobs with dead-letter semantics. Removes a dedicated AMQP broker from the single-node deployment. |
+| [A-003](adr/A-003-redis-url-frontier-and-cache.md) | Redis as the URL frontier, cache, and BullMQ backing store | Accepted | Sub-millisecond latency, TTL-native, no durability required for frontier. Doubles as the BullMQ substrate. |
+| [A-004](adr/A-004-postgres-with-pgvector.md) | PostgreSQL + pgvector for relational data and embeddings | Accepted | Avoids introducing a second datastore until scale forces one. |
+| [A-005](adr/A-005-s3-compatible-object-storage.md) | S3-compatible object storage for blobs | Accepted | Portable across MinIO / AWS / R2 / B2. No vendor-specific APIs. |
+| [A-006](adr/A-006-fastify-api-gateway.md) | Fastify + Zod as the API gateway | Accepted | Async, schema-validated, TypeScript-native; shares Zod schemas with workers and the Next.js client. |
+| [A-007](adr/A-007-nextjs-web-frontend.md) | Next.js for the web frontend | Accepted | SSR, strong ecosystem, comfortable for contributing developers. Same TypeScript toolchain as the backend. |
+| [A-008](adr/A-008-byok-third-party-indexes.md) | BYOK for all third-party indexes | Accepted | Explicit non-goal to replicate proprietary indexes. |
+| [A-009](adr/A-009-llm-optional-never-required.md) | LLM calls optional, never required for scoring | Accepted | Keeps deterministic core functional offline; degrades gracefully. |
+| [A-010](adr/A-010-opentelemetry-tracing.md) | OpenTelemetry for distributed tracing | Accepted | Vendor-neutral standard; avoids lock-in. |
 
-Any future deviation from these decisions requires a written ADR and explicit deprecation of the replaced entry.
+Any future deviation from these decisions requires a new ADR under [`adr/`](adr/) that supersedes the replaced entry, and a matching edit to this table in the same PR.

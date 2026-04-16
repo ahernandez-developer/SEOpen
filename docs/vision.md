@@ -32,7 +32,7 @@ Existing SEO suites maintain vast proprietary indexes of the open web. That capi
 Replicating that index from scratch is **not** SEOpen's goal — it would require tens of millions of dollars in infrastructure. Instead, SEOpen takes a different architectural stance:
 
 1. **Own the auditing layer.** A crawler that visits *your* sites (or a defined set of competitor sites) is well within reach of a single-node deployment, and scales linearly under a distributed architecture. There is no structural reason this layer must be closed.
-2. **Rent the index layer.** Global keyword volumes, historical rank data, and backlink graphs are commodity inputs available from third-party APIs (DataForSEO, SerpApi, SE Ranking, Semrush). SEOpen integrates with them under a **bring-your-own-key (BYOK)** model: users supply their own credentials and interact with providers directly.
+2. **Rent the index layer.** Global keyword volumes, historical rank data, and backlink graphs are commodity inputs available from third-party APIs. SEOpen integrates with them under a **bring-your-own-key (BYOK)** model: users supply their own credentials and interact with providers directly. The specific providers supported in the first release are catalogued in [`data-integrations.md`](data-integrations.md) §5.3.
 3. **Publish the methodology.** All scoring formulas and weightings are documented in [`scoring.md`](scoring.md). Users can audit, customize, and fork them. This is the opposite of a black-box "authority score."
 
 The result: enterprise-grade diagnostics running on infrastructure the user controls, with full transparency into every metric produced.
@@ -46,13 +46,13 @@ Two macro trends converge to make this the right moment:
 
 ## Where SEOpen fits in the landscape
 
-| Category | Example Tools | What they do well | Where they fall short |
-| --- | --- | --- | --- |
-| Monolithic SEO suites | Semrush, Ahrefs | Global keyword/backlink indexes, polished UX | Closed source, minimal GEO coverage, no self-host |
-| Lightweight SEO tools | SE Ranking, Ubersuggest | Approachable, broad feature set | Closed source, limited extensibility |
-| Pure GEO trackers | Various 2025-era startups | First-mover GEO metrics | No traditional SEO depth, closed algorithms |
-| OSS crawlers | Scrapy, Crawlee, Firecrawl | Flexible extraction | No scoring, no UI, no reporting |
-| OSS SEO dashboards | A handful of early projects | Self-hostable | Limited feature surface, minimal GEO |
+| Category | What they do well | Where they fall short |
+| --- | --- | --- |
+| Enterprise SEO suites | Global keyword and backlink indexes, polished UX | Closed source, minimal GEO coverage, no self-host |
+| Lightweight SEO tools | Approachable, broad feature set | Closed source, limited extensibility |
+| Pure GEO trackers | First-mover GEO metrics | No traditional SEO depth, closed algorithms |
+| OSS crawlers | Flexible extraction | No scoring, no UI, no reporting |
+| OSS SEO dashboards | Self-hostable | Limited feature surface, minimal GEO |
 
 SEOpen's wedge is the **unified, open, transparent, dual-discipline (SEO + GEO)** category — which no existing tool occupies end to end.
 
@@ -60,7 +60,7 @@ SEOpen's wedge is the **unified, open, transparent, dual-discipline (SEO + GEO)*
 
 Clarity about what SEOpen is **not**:
 
-- **Not a global index of the open web.** SEOpen will never try to replicate Semrush's backlink graph from scratch. That data is rented via BYOK integrations.
+- **Not a global index of the open web.** SEOpen will never try to replicate a commercial backlink graph or keyword index from scratch. That data is rented via BYOK integrations.
 - **Not a content generator.** The platform scores and diagnoses content; authoring AI-written content is explicitly out of scope (though the recommendations can feed an external generator).
 - **Not a replacement for Google Search Console or Google Analytics.** SEOpen augments them; it does not replace owned-property analytics.
 - **Not a black box.** Any metric the user cannot trace to a formula in [`scoring.md`](scoring.md) is a bug.
