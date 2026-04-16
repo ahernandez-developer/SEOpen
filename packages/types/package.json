@@ -1,0 +1,35 @@
+{
+  "name": "@seopen/types",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared Zod schemas and TypeScript types for SEOpen packages.",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "test": "node --import tsx --conditions=source --test test/*.test.ts"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
