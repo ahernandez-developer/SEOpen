@@ -18,7 +18,7 @@ SEOpen's crawl and scoring pipelines produce several large, opaque artifacts per
 
 These artifacts share a profile: large, write-once, read-rarely-but-randomly, no need for relational joins, and highly compressible. Storing them in PostgreSQL (`BYTEA` columns) would bloat the relational store, wreck the query planner's statistics, and force vacuum / backup workflows to move gigabytes per project. They belong in object storage.
 
-SEOpen's self-host-first posture ([`../overview.md`](../overview.md), [`../roadmap.md`](../roadmap.md)) requires that the storage layer work on a laptop (no cloud account required) and at fleet scale (AWS S3, Cloudflare R2, Backblaze B2, managed MinIO) *without code changes*. The vocabulary of the Amazon S3 REST API is the de facto portability standard across every major implementation.
+SEOpen's self-host-first posture ([`../overview.md`](../overview.md), [`../roadmap.md`](../roadmap.md)) requires that the storage layer work on a laptop (no cloud account required) and at fleet scale (AWS S3, Cloudflare R2, Backblaze B2, managed MinIO) _without code changes_. The vocabulary of the Amazon S3 REST API is the de facto portability standard across every major implementation.
 
 ## Decision
 

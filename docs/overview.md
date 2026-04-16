@@ -47,12 +47,12 @@ Full architecture detail in [`architecture.md`](architecture.md).
 
 ## Who it is for
 
-| Persona | Why SEOpen |
-| --- | --- |
-| **Independent developers / indie hackers** | Free, self-hostable, BYOK — run full audits against real domains on a laptop. |
-| **SEO & marketing agencies** | Audit unlimited client sites on owned infrastructure. |
-| **In-house SEO / content teams** | Own the data, customize the scoring weights, integrate with internal pipelines. |
-| **Academic & research communities** | Transparent algorithms enable reproducible research on SEO and GEO. |
+| Persona                                    | Why SEOpen                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------- |
+| **Independent developers / indie hackers** | Free, self-hostable, BYOK — run full audits against real domains on a laptop.   |
+| **SEO & marketing agencies**               | Audit unlimited client sites on owned infrastructure.                           |
+| **In-house SEO / content teams**           | Own the data, customize the scoring weights, integrate with internal pipelines. |
+| **Academic & research communities**        | Transparent algorithms enable reproducible research on SEO and GEO.             |
 
 ---
 
@@ -90,6 +90,6 @@ Details, rationale, and alternatives are in [`architecture.md`](architecture.md)
 
 ---
 
-## What this document is *not*
+## What this document is _not_
 
-This is a **foundation document**, not an implementation document. It states *what* the platform is and *why* each decision was made. It does not contain installation instructions, API references, or source code — those land once Phase 1 of the roadmap ([`roadmap.md`](roadmap.md)) begins.
+This is a **foundation document**, not an implementation document. It states _what_ the platform is and _why_ each decision was made. It does not contain installation instructions, API references, or source code — those land once Phase 1 of the roadmap ([`roadmap.md`](roadmap.md)) begins.

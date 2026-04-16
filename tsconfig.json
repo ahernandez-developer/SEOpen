@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/types" },
+    { "path": "./packages/scoring" },
+    { "path": "./packages/parse" },
+    { "path": "./packages/fetch" },
+    { "path": "./packages/cli" }
+  ]
+}

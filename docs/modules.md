@@ -2,12 +2,12 @@
 
 SEOpen is organized into four top-level modules. Each is independently useful and can run in isolation, but they share a common data model, crawler, and UI — so composing them across a project gives compounding value.
 
-| # | Module | Primary Persona | Outputs |
-| --- | --- | --- | --- |
-| 1 | Technical SEO & Performance Auditor | Technical SEO, site reliability | SEO Score, issue backlog, Lighthouse reports |
-| 2 | AI Visibility & GEO Checker | Brand strategist, content lead | AI Visibility Score, citation mentions, GEO content grade |
-| 3 | Keyword & Content Gap Analyzer | Content strategist, SEO lead | Missing keywords, missing prompts, structural gap recommendations |
-| 4 | Scoring & Reporting Engine | Everyone | Dashboards, exports, historical trends |
+| #   | Module                              | Primary Persona                 | Outputs                                                           |
+| --- | ----------------------------------- | ------------------------------- | ----------------------------------------------------------------- |
+| 1   | Technical SEO & Performance Auditor | Technical SEO, site reliability | SEO Score, issue backlog, Lighthouse reports                      |
+| 2   | AI Visibility & GEO Checker         | Brand strategist, content lead  | AI Visibility Score, citation mentions, GEO content grade         |
+| 3   | Keyword & Content Gap Analyzer      | Content strategist, SEO lead    | Missing keywords, missing prompts, structural gap recommendations |
+| 4   | Scoring & Reporting Engine          | Everyone                        | Dashboards, exports, historical trends                            |
 
 ---
 
@@ -47,7 +47,7 @@ The foundation of both SEO and GEO is technical accessibility. If a crawler cann
 This is SEOpen's defining module — the first-class, open-source tracker for brand visibility inside generative AI outputs. It answers two distinct questions:
 
 1. **"How often do generative engines cite my brand / domain / entity?"** — measured empirically by querying the engines themselves.
-2. **"How *citation-worthy* is my content, structurally?"** — scored predictively from content properties the research literature identifies as citation-predictive.
+2. **"How _citation-worthy_ is my content, structurally?"** — scored predictively from content properties the research literature identifies as citation-predictive.
 
 ### Sub-module A: Empirical AI Visibility Tracking
 
@@ -85,7 +85,7 @@ Outputs a **GEO Content Score** (0–100) with weighted sub-categories, defined 
 
 ### Purpose
 
-Classical keyword research plus its GEO counterpart. Tells users what queries (and what *prompts*) they should be winning but aren't, and what structural changes would close each gap.
+Classical keyword research plus its GEO counterpart. Tells users what queries (and what _prompts_) they should be winning but aren't, and what structural changes would close each gap.
 
 ### Classical SEO research
 
@@ -150,9 +150,9 @@ Several cross-cutting features apply to every module above:
 
 ## Explicitly deferred features (not in MVP)
 
-To keep the MVP surface area honest, the following are called out as *planned but not included* in the initial release:
+To keep the MVP surface area honest, the following are called out as _planned but not included_ in the initial release:
 
-- Backlink index crawling *from scratch* (SEOpen relies on BYOK providers for this).
+- Backlink index crawling _from scratch_ (SEOpen relies on BYOK providers for this).
 - Rank tracking for hundreds of thousands of keywords (out of scope for v1 — use BYOK SERP providers for large-scale tracking).
 - AI content generation (explicitly out of scope — see [`vision.md`](vision.md) non-goals).
 - Paid ads / PPC research modules (would dilute focus).

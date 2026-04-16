@@ -30,14 +30,14 @@ SEOpen never brokers, marks up, or proxies provider usage. Every byte of billabl
 
 Providers are grouped by the type of data they contribute. SEOpen's internal data model is provider-agnostic — multiple providers can contribute the same category, and users may select one or mix.
 
-| Category | What it provides | Example providers |
-| --- | --- | --- |
-| **All-in-one SEO data** | Keyword volumes, SERPs, backlinks, domain metrics, competitor data — in a single contract. | DataForSEO, SE Ranking |
-| **SERP scraping** | Real-time, unvarnished SERP results including AI Overviews, local packs, featured snippets. | SerpApi, Zenserp, ScaleSERP |
-| **Backlink intelligence** | Referring domains, anchors, link velocity, historical backlinks. | DataForSEO, Semrush API, Ahrefs API |
-| **Keyword research** | Volume, difficulty, CPC, SERP features, related queries, question queries. | DataForSEO, Semrush API, SE Ranking |
-| **Generative AI** | Semantic analysis, prompt submission, citation extraction, embedding generation. | OpenAI, Anthropic Claude, Google AI, Perplexity API, local models via Ollama |
-| **Core Web Vitals (field data)** | Real user CrUX metrics beyond lab Lighthouse runs. | CrUX API (free, rate-limited) |
+| Category                         | What it provides                                                                            | Example providers                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **All-in-one SEO data**          | Keyword volumes, SERPs, backlinks, domain metrics, competitor data — in a single contract.  | DataForSEO, SE Ranking                                                       |
+| **SERP scraping**                | Real-time, unvarnished SERP results including AI Overviews, local packs, featured snippets. | SerpApi, Zenserp, ScaleSERP                                                  |
+| **Backlink intelligence**        | Referring domains, anchors, link velocity, historical backlinks.                            | DataForSEO, Semrush API, Ahrefs API                                          |
+| **Keyword research**             | Volume, difficulty, CPC, SERP features, related queries, question queries.                  | DataForSEO, Semrush API, SE Ranking                                          |
+| **Generative AI**                | Semantic analysis, prompt submission, citation extraction, embedding generation.            | OpenAI, Anthropic Claude, Google AI, Perplexity API, local models via Ollama |
+| **Core Web Vitals (field data)** | Real user CrUX metrics beyond lab Lighthouse runs.                                          | CrUX API (free, rate-limited)                                                |
 
 ---
 

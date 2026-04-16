@@ -1,0 +1,39 @@
+{
+  "name": "@seopen/scoring",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic SEO and GEO score engines for SEOpen.",
+  "author": "ahernandez-developer",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "test": "node --import tsx --conditions=source --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@seopen/types": "workspace:*",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@seopen/parse": "workspace:*",
+    "fast-check": "^3.23.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

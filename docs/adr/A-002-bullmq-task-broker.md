@@ -8,7 +8,7 @@
 
 ## Context
 
-SEOpen's design principle §4.1.2 ([`../architecture.md`](../architecture.md)) requires that every inter-service call cross a message broker. The original foundation draft chose **RabbitMQ** as the primary broker because it was the mature default for polyglot stacks: AMQP is language-neutral, durable queues and priority classes are well-understood, and dead-letter queues are first-class. That rationale was sound *when the stack was polyglot*.
+SEOpen's design principle §4.1.2 ([`../architecture.md`](../architecture.md)) requires that every inter-service call cross a message broker. The original foundation draft chose **RabbitMQ** as the primary broker because it was the mature default for polyglot stacks: AMQP is language-neutral, durable queues and priority classes are well-understood, and dead-letter queues are first-class. That rationale was sound _when the stack was polyglot_.
 
 Once [A-001](A-001-single-runtime-nodejs.md) locked the core runtime to TypeScript, the polyglot argument for AMQP evaporated. The remaining broker requirements — durability, retries, priority, scheduled / delayed jobs, dead-letter queues, backpressure, observability, horizontal workers — are all first-class features of **BullMQ**, a TypeScript job queue that piggy-backs on Redis.
 
