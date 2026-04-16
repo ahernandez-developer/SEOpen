@@ -88,17 +88,17 @@ The seam is still a **message broker**, never a direct HTTP call. An extraction 
 
 ### Service responsibilities
 
-| Service | Runtime | Runs as | Responsibilities |
-| --- | --- | --- | --- |
-| **Web Frontend** | TypeScript (Next.js) | Long-running web server | Dashboards, project config UI, report rendering, exports. Server-side rendering for first-byte performance. |
-| **API Gateway** | TypeScript (Fastify + Zod) | Long-running web server | Auth (JWT/OAuth), RBAC, Zod-validated requests, rate limiting, enqueue jobs, aggregate read-only queries. |
-| **Extraction Workers** | TypeScript (Crawlee / Puppeteer) | Auto-scaled pool | Pull crawl tasks, drive headless browsers, run Lighthouse, persist raw HTML + Lighthouse JSON to object storage, emit analysis tasks. |
-| **Analysis Workers** | TypeScript | Auto-scaled pool | Pull analysis tasks, transform HTML → Markdown via `@mozilla/readability` + `unified` / `rehype-remark`, compute deterministic scores, run LLM-backed semantic analyses, persist scores. |
-| **Scheduler** | TypeScript | Long-running | Fires time-based runs (daily crawl, weekly GEO sweep) onto the broker. |
-| **Task Broker** | BullMQ on Redis | Infra | Delayed, prioritized, retryable job queues with dead-letter semantics. See [A-002](adr/A-002-bullmq-task-broker.md) for why BullMQ replaced the original RabbitMQ choice. |
-| **Redis** | Redis | Infra | URL frontier (sets / bloom filters), per-domain rate limits, ephemeral caches, session stores, BullMQ backing store. |
-| **PostgreSQL** | PostgreSQL + pgvector | Infra | Source of truth for users, projects, scores, historical trends, audit log, and embedding vectors. |
-| **Object Storage** | S3-compatible (MinIO for self-host) | Infra | Raw HTML, Markdown exports, Lighthouse JSON, PDF reports. |
+| Service                | Runtime                             | Runs as                 | Responsibilities                                                                                                                                                                         |
+| ---------------------- | ----------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Web Frontend**       | TypeScript (Next.js)                | Long-running web server | Dashboards, project config UI, report rendering, exports. Server-side rendering for first-byte performance.                                                                              |
+| **API Gateway**        | TypeScript (Fastify + Zod)          | Long-running web server | Auth (JWT/OAuth), RBAC, Zod-validated requests, rate limiting, enqueue jobs, aggregate read-only queries.                                                                                |
+| **Extraction Workers** | TypeScript (Crawlee / Puppeteer)    | Auto-scaled pool        | Pull crawl tasks, drive headless browsers, run Lighthouse, persist raw HTML + Lighthouse JSON to object storage, emit analysis tasks.                                                    |
+| **Analysis Workers**   | TypeScript                          | Auto-scaled pool        | Pull analysis tasks, transform HTML → Markdown via `@mozilla/readability` + `unified` / `rehype-remark`, compute deterministic scores, run LLM-backed semantic analyses, persist scores. |
+| **Scheduler**          | TypeScript                          | Long-running            | Fires time-based runs (daily crawl, weekly GEO sweep) onto the broker.                                                                                                                   |
+| **Task Broker**        | BullMQ on Redis                     | Infra                   | Delayed, prioritized, retryable job queues with dead-letter semantics. See [A-002](adr/A-002-bullmq-task-broker.md) for why BullMQ replaced the original RabbitMQ choice.                |
+| **Redis**              | Redis                               | Infra                   | URL frontier (sets / bloom filters), per-domain rate limits, ephemeral caches, session stores, BullMQ backing store.                                                                     |
+| **PostgreSQL**         | PostgreSQL + pgvector               | Infra                   | Source of truth for users, projects, scores, historical trends, audit log, and embedding vectors.                                                                                        |
+| **Object Storage**     | S3-compatible (MinIO for self-host) | Infra                   | Raw HTML, Markdown exports, Lighthouse JSON, PDF reports.                                                                                                                                |
 
 ---
 
@@ -118,14 +118,14 @@ The **URL frontier** is the queue of URLs discovered but not yet visited. It is 
 
 SEOpen uses a deliberately partitioned storage strategy — different data shapes, different stores.
 
-| Data type | Store | Why |
-| --- | --- | --- |
-| Users, projects, permissions | PostgreSQL | ACID, relational integrity, strong query planner. |
-| Scores, sub-scores, historical trends | PostgreSQL (time-series friendly schema) | Easy aggregations, joins to projects/URLs, reliable backup story. |
-| Crawl metadata, URL catalog, issue backlog | PostgreSQL | Needs joins and filters, natural fit for a relational schema. |
-| Raw HTML, Markdown, Lighthouse JSON, PDFs | Object storage (S3 / MinIO) | Large, opaque blobs. Cheap, durable, horizontally scalable. |
-| URL frontier, rate-limit counters, session state | Redis | Sub-millisecond latency, TTL-native, no durability required. |
-| Embeddings for SRS / semantic gap analysis | pgvector (PostgreSQL extension) | Keeps embeddings next to the project data for efficient joins. Avoids introducing a separate vector DB until scale forces it. |
+| Data type                                        | Store                                    | Why                                                                                                                           |
+| ------------------------------------------------ | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Users, projects, permissions                     | PostgreSQL                               | ACID, relational integrity, strong query planner.                                                                             |
+| Scores, sub-scores, historical trends            | PostgreSQL (time-series friendly schema) | Easy aggregations, joins to projects/URLs, reliable backup story.                                                             |
+| Crawl metadata, URL catalog, issue backlog       | PostgreSQL                               | Needs joins and filters, natural fit for a relational schema.                                                                 |
+| Raw HTML, Markdown, Lighthouse JSON, PDFs        | Object storage (S3 / MinIO)              | Large, opaque blobs. Cheap, durable, horizontally scalable.                                                                   |
+| URL frontier, rate-limit counters, session state | Redis                                    | Sub-millisecond latency, TTL-native, no durability required.                                                                  |
+| Embeddings for SRS / semantic gap analysis       | pgvector (PostgreSQL extension)          | Keeps embeddings next to the project data for efficient joins. Avoids introducing a separate vector DB until scale forces it. |
 
 The object storage layer is S3-compatible; deployments can point at MinIO, AWS S3, Backblaze B2, Cloudflare R2, or any compatible provider. No S3-specific APIs are used beyond the documented compatibility surface.
 
@@ -192,17 +192,17 @@ The architecture supports two deployment shapes without rewrites.
 
 These are binding decisions. Long-form records live under [`adr/`](adr/); this table is the summary index. Whenever an ADR is added, superseded, or deprecated, both this table and [`adr/README.md`](adr/README.md) update in the same PR. If the two ever disagree, the ADR wins.
 
-| # | Decision | Status | Rationale |
-| --- | --- | --- | --- |
-| [A-001](adr/A-001-single-runtime-nodejs.md) | Single runtime: Node.js / TypeScript | Accepted | One runtime across extraction, analysis, scoring, API, CLI, frontend. See §4.2. |
-| [A-002](adr/A-002-bullmq-task-broker.md) | BullMQ on Redis as the primary task broker | Accepted | Durable, prioritized, retryable jobs with dead-letter semantics. Removes a dedicated AMQP broker from the single-node deployment. |
-| [A-003](adr/A-003-redis-url-frontier-and-cache.md) | Redis as the URL frontier, cache, and BullMQ backing store | Accepted | Sub-millisecond latency, TTL-native, no durability required for frontier. Doubles as the BullMQ substrate. |
-| [A-004](adr/A-004-postgres-with-pgvector.md) | PostgreSQL + pgvector for relational data and embeddings | Accepted | Avoids introducing a second datastore until scale forces one. |
-| [A-005](adr/A-005-s3-compatible-object-storage.md) | S3-compatible object storage for blobs | Accepted | Portable across MinIO / AWS / R2 / B2. No vendor-specific APIs. |
-| [A-006](adr/A-006-fastify-api-gateway.md) | Fastify + Zod as the API gateway | Accepted | Async, schema-validated, TypeScript-native; shares Zod schemas with workers and the Next.js client. |
-| [A-007](adr/A-007-nextjs-web-frontend.md) | Next.js for the web frontend | Accepted | SSR, strong ecosystem, comfortable for contributing developers. Same TypeScript toolchain as the backend. |
-| [A-008](adr/A-008-byok-third-party-indexes.md) | BYOK for all third-party indexes | Accepted | Explicit non-goal to replicate proprietary indexes. |
-| [A-009](adr/A-009-llm-optional-never-required.md) | LLM calls optional, never required for scoring | Accepted | Keeps deterministic core functional offline; degrades gracefully. |
-| [A-010](adr/A-010-opentelemetry-tracing.md) | OpenTelemetry for distributed tracing | Accepted | Vendor-neutral standard; avoids lock-in. |
+| #                                                  | Decision                                                   | Status   | Rationale                                                                                                                         |
+| -------------------------------------------------- | ---------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| [A-001](adr/A-001-single-runtime-nodejs.md)        | Single runtime: Node.js / TypeScript                       | Accepted | One runtime across extraction, analysis, scoring, API, CLI, frontend. See §4.2.                                                   |
+| [A-002](adr/A-002-bullmq-task-broker.md)           | BullMQ on Redis as the primary task broker                 | Accepted | Durable, prioritized, retryable jobs with dead-letter semantics. Removes a dedicated AMQP broker from the single-node deployment. |
+| [A-003](adr/A-003-redis-url-frontier-and-cache.md) | Redis as the URL frontier, cache, and BullMQ backing store | Accepted | Sub-millisecond latency, TTL-native, no durability required for frontier. Doubles as the BullMQ substrate.                        |
+| [A-004](adr/A-004-postgres-with-pgvector.md)       | PostgreSQL + pgvector for relational data and embeddings   | Accepted | Avoids introducing a second datastore until scale forces one.                                                                     |
+| [A-005](adr/A-005-s3-compatible-object-storage.md) | S3-compatible object storage for blobs                     | Accepted | Portable across MinIO / AWS / R2 / B2. No vendor-specific APIs.                                                                   |
+| [A-006](adr/A-006-fastify-api-gateway.md)          | Fastify + Zod as the API gateway                           | Accepted | Async, schema-validated, TypeScript-native; shares Zod schemas with workers and the Next.js client.                               |
+| [A-007](adr/A-007-nextjs-web-frontend.md)          | Next.js for the web frontend                               | Accepted | SSR, strong ecosystem, comfortable for contributing developers. Same TypeScript toolchain as the backend.                         |
+| [A-008](adr/A-008-byok-third-party-indexes.md)     | BYOK for all third-party indexes                           | Accepted | Explicit non-goal to replicate proprietary indexes.                                                                               |
+| [A-009](adr/A-009-llm-optional-never-required.md)  | LLM calls optional, never required for scoring             | Accepted | Keeps deterministic core functional offline; degrades gracefully.                                                                 |
+| [A-010](adr/A-010-opentelemetry-tracing.md)        | OpenTelemetry for distributed tracing                      | Accepted | Vendor-neutral standard; avoids lock-in.                                                                                          |
 
 Any future deviation from these decisions requires a new ADR under [`adr/`](adr/) that supersedes the replaced entry, and a matching edit to this table in the same PR.

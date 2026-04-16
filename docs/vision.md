@@ -17,9 +17,9 @@ The measurement stack built for the ten-blue-links era is **blind** to all of th
 
 ## From SEO to GEO
 
-**Search Engine Optimization (SEO)** is the discipline of optimizing digital assets for algorithmic ranking to maximize outbound clicks. Its measurement primitives are *position*, *impressions*, *click-through rate*, and *session duration*.
+**Search Engine Optimization (SEO)** is the discipline of optimizing digital assets for algorithmic ranking to maximize outbound clicks. Its measurement primitives are _position_, _impressions_, _click-through rate_, and _session duration_.
 
-**Generative Engine Optimization (GEO)** is the discipline of optimizing content so generative AI systems accurately extract, contextually recognize, and explicitly cite it when formulating responses. Its measurement primitives are *citation frequency*, *extraction rate*, *semantic relevance*, and *entity prominence*.
+**Generative Engine Optimization (GEO)** is the discipline of optimizing content so generative AI systems accurately extract, contextually recognize, and explicitly cite it when formulating responses. Its measurement primitives are _citation frequency_, _extraction rate_, _semantic relevance_, and _entity prominence_.
 
 GEO is not a replacement for SEO. Classical SEO still drives traffic, especially for transactional and navigational queries. But for the vast, growing class of informational and research queries that LLMs now resolve directly, **GEO is the only signal that matters**.
 
@@ -31,7 +31,7 @@ Existing SEO suites maintain vast proprietary indexes of the open web. That capi
 
 Replicating that index from scratch is **not** SEOpen's goal — it would require tens of millions of dollars in infrastructure. Instead, SEOpen takes a different architectural stance:
 
-1. **Own the auditing layer.** A crawler that visits *your* sites (or a defined set of competitor sites) is well within reach of a single-node deployment, and scales linearly under a distributed architecture. There is no structural reason this layer must be closed.
+1. **Own the auditing layer.** A crawler that visits _your_ sites (or a defined set of competitor sites) is well within reach of a single-node deployment, and scales linearly under a distributed architecture. There is no structural reason this layer must be closed.
 2. **Rent the index layer.** Global keyword volumes, historical rank data, and backlink graphs are commodity inputs available from third-party APIs. SEOpen integrates with them under a **bring-your-own-key (BYOK)** model: users supply their own credentials and interact with providers directly. The specific providers supported in the first release are catalogued in [`data-integrations.md`](data-integrations.md) §5.3.
 3. **Publish the methodology.** All scoring formulas and weightings are documented in [`scoring.md`](scoring.md). Users can audit, customize, and fork them. This is the opposite of a black-box "authority score."
 
@@ -46,13 +46,13 @@ Two macro trends converge to make this the right moment:
 
 ## Where SEOpen fits in the landscape
 
-| Category | What they do well | Where they fall short |
-| --- | --- | --- |
+| Category              | What they do well                                | Where they fall short                             |
+| --------------------- | ------------------------------------------------ | ------------------------------------------------- |
 | Enterprise SEO suites | Global keyword and backlink indexes, polished UX | Closed source, minimal GEO coverage, no self-host |
-| Lightweight SEO tools | Approachable, broad feature set | Closed source, limited extensibility |
-| Pure GEO trackers | First-mover GEO metrics | No traditional SEO depth, closed algorithms |
-| OSS crawlers | Flexible extraction | No scoring, no UI, no reporting |
-| OSS SEO dashboards | Self-hostable | Limited feature surface, minimal GEO |
+| Lightweight SEO tools | Approachable, broad feature set                  | Closed source, limited extensibility              |
+| Pure GEO trackers     | First-mover GEO metrics                          | No traditional SEO depth, closed algorithms       |
+| OSS crawlers          | Flexible extraction                              | No scoring, no UI, no reporting                   |
+| OSS SEO dashboards    | Self-hostable                                    | Limited feature surface, minimal GEO              |
 
 SEOpen's wedge is the **unified, open, transparent, dual-discipline (SEO + GEO)** category — which no existing tool occupies end to end.
 

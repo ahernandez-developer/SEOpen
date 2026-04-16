@@ -8,7 +8,7 @@ The phase numbering is stable. New scope is appended to later phases; never inse
 
 ## Phase 0 — Foundation (current)
 
-The project's *ideas* become publicly legible and contributable.
+The project's _ideas_ become publicly legible and contributable.
 
 **Exit criteria:**
 
@@ -17,8 +17,8 @@ The project's *ideas* become publicly legible and contributable.
 - [x] Foundation documentation set complete under `docs/` (this document is part of that set).
 - [x] `LICENSE` added to the repository root.
 - [x] `CONTRIBUTING.md` published and linked from the README.
-- [ ] Initial GitHub issue templates. *(descoped from Phase 0; will land alongside Phase 1 if demand materializes.)*
-- [ ] Public Discord or GitHub Discussions space open. *(descoped from Phase 0; GitHub Issues / private CoC channel cover the minimum for now.)*
+- [ ] Initial GitHub issue templates. _(descoped from Phase 0; will land alongside Phase 1 if demand materializes.)_
+- [ ] Public Discord or GitHub Discussions space open. _(descoped from Phase 0; GitHub Issues / private CoC channel cover the minimum for now.)_
 - [x] First ADR directory (`docs/adr/`) with the decisions from [`architecture.md`](architecture.md) §4.10 as individually dated records.
 - [x] `CODE_OF_CONDUCT.md` adopted.
 
@@ -85,7 +85,7 @@ The module that turns SEOpen into a dual-discipline platform. Technical SEO alon
 
 ## Phase 3 — Keyword & Content Gap Analyzer
 
-The research and competitive-intelligence layer that tells users *what* to create next.
+The research and competitive-intelligence layer that tells users _what_ to create next.
 
 **Feature exit criteria:**
 

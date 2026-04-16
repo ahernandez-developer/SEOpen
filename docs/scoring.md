@@ -27,12 +27,12 @@ Where each pillar is itself normalized to 0–100, and the weights satisfy `w_C 
 
 ### Default weights
 
-| Pillar | Symbol | Default Weight | Rationale |
-| --- | --- | --- | --- |
-| Content Quality | `w_C` | **0.25** | On-page content is the single largest controllable factor. |
-| Technical Infrastructure | `w_T` | **0.30** | Crawlability and renderability are preconditions for everything else. |
-| User Experience | `w_U` | **0.20** | Core Web Vitals are measurable, reproducible, and correlated with ranking. |
-| Authority & Trust | `w_A` | **0.25** | Backlink/authority data comes from BYOK providers; weighted to reflect its signal value. |
+| Pillar                   | Symbol | Default Weight | Rationale                                                                                |
+| ------------------------ | ------ | -------------- | ---------------------------------------------------------------------------------------- |
+| Content Quality          | `w_C`  | **0.25**       | On-page content is the single largest controllable factor.                               |
+| Technical Infrastructure | `w_T`  | **0.30**       | Crawlability and renderability are preconditions for everything else.                    |
+| User Experience          | `w_U`  | **0.20**       | Core Web Vitals are measurable, reproducible, and correlated with ranking.               |
+| Authority & Trust        | `w_A`  | **0.25**       | Backlink/authority data comes from BYOK providers; weighted to reflect its signal value. |
 
 Weights are configurable per project. Defaults are rebaselined periodically against industry correlation studies.
 
@@ -40,36 +40,36 @@ Weights are configurable per project. Defaults are rebaselined periodically agai
 
 Sources its inputs from the content analysis pipeline:
 
-| Input | Description | Contribution |
-| --- | --- | --- |
-| Semantic Relevance | TF-IDF and embedding-based relevance of content against declared target topics. | 30% |
-| Topic Coverage | Breadth of subtopic coverage relative to top-ranking competitors. | 20% |
-| Structured Data Completeness | Schema.org types declared, validated, and matching content entities. | 20% |
-| Meta Completeness | Title, description, H1, Open Graph, Twitter Card presence and length conformance. | 15% |
-| Readability & Length | Appropriate depth vs. query intent; penalizes thin content. | 15% |
+| Input                        | Description                                                                       | Contribution |
+| ---------------------------- | --------------------------------------------------------------------------------- | ------------ |
+| Semantic Relevance           | TF-IDF and embedding-based relevance of content against declared target topics.   | 30%          |
+| Topic Coverage               | Breadth of subtopic coverage relative to top-ranking competitors.                 | 20%          |
+| Structured Data Completeness | Schema.org types declared, validated, and matching content entities.              | 20%          |
+| Meta Completeness            | Title, description, H1, Open Graph, Twitter Card presence and length conformance. | 15%          |
+| Readability & Length         | Appropriate depth vs. query intent; penalizes thin content.                       | 15%          |
 
 ### Technical Infrastructure sub-score
 
-| Input | Description | Contribution |
-| --- | --- | --- |
-| Indexability | Robots / meta / canonical / sitemap consistency. | 25% |
-| Crawlability | Depth-of-reach from seed, orphan detection, crawl-budget hygiene. | 20% |
-| HTTP Health | Status distribution, redirect chain length, 4xx/5xx ratio. | 20% |
-| HTTPS & Security | TLS validity, mixed-content detection, HSTS, secure cookies. | 15% |
-| Duplicate Content | Shingle-based near-duplicate ratio across the crawled corpus. | 10% |
-| Internal Link Graph | PageRank-style equity distribution, link-equity sinks, and orphan rate. | 10% |
+| Input               | Description                                                             | Contribution |
+| ------------------- | ----------------------------------------------------------------------- | ------------ |
+| Indexability        | Robots / meta / canonical / sitemap consistency.                        | 25%          |
+| Crawlability        | Depth-of-reach from seed, orphan detection, crawl-budget hygiene.       | 20%          |
+| HTTP Health         | Status distribution, redirect chain length, 4xx/5xx ratio.              | 20%          |
+| HTTPS & Security    | TLS validity, mixed-content detection, HSTS, secure cookies.            | 15%          |
+| Duplicate Content   | Shingle-based near-duplicate ratio across the crawled corpus.           | 10%          |
+| Internal Link Graph | PageRank-style equity distribution, link-equity sinks, and orphan rate. | 10%          |
 
 ### User Experience sub-score
 
 Sourced directly from Lighthouse and Core Web Vitals:
 
-| Input | Description | Contribution |
-| --- | --- | --- |
-| Largest Contentful Paint (LCP) | Good: ≤2.5s. Needs Improvement: 2.5–4.0s. Poor: >4.0s. | 30% |
-| Interaction to Next Paint (INP) | Good: ≤200ms. Needs Improvement: 200–500ms. Poor: >500ms. | 30% |
-| Cumulative Layout Shift (CLS) | Good: ≤0.1. Needs Improvement: 0.1–0.25. Poor: >0.25. | 20% |
-| Time to First Byte (TTFB) | Server response latency threshold. | 10% |
-| Lighthouse Accessibility | Included as a UX signal (accessibility failures also reduce reach). | 10% |
+| Input                           | Description                                                         | Contribution |
+| ------------------------------- | ------------------------------------------------------------------- | ------------ |
+| Largest Contentful Paint (LCP)  | Good: ≤2.5s. Needs Improvement: 2.5–4.0s. Poor: >4.0s.              | 30%          |
+| Interaction to Next Paint (INP) | Good: ≤200ms. Needs Improvement: 200–500ms. Poor: >500ms.           | 30%          |
+| Cumulative Layout Shift (CLS)   | Good: ≤0.1. Needs Improvement: 0.1–0.25. Poor: >0.25.               | 20%          |
+| Time to First Byte (TTFB)       | Server response latency threshold.                                  | 10%          |
+| Lighthouse Accessibility        | Included as a UX signal (accessibility failures also reduce reach). | 10%          |
 
 Sub-score maps the thresholds onto 0–100 via piecewise-linear interpolation so that "just barely green" scores around 75 and "well under the Good threshold" scores closer to 95–100.
 
@@ -77,13 +77,13 @@ Sub-score maps the thresholds onto 0–100 via piecewise-linear interpolation so
 
 Populated from BYOK backlink providers:
 
-| Input | Description | Contribution |
-| --- | --- | --- |
-| Referring Domains | Distinct root domains linking inbound. | 35% |
-| Referring Domain Quality | Weighted by the provider's trust/authority metric. | 25% |
-| Link Velocity | Growth or decay of referring domains over the past 90 days. | 15% |
-| Anchor Text Diversity | Guards against over-optimized / spam-pattern anchors. | 15% |
-| Brand Mentions | Unlinked mentions treated as a soft authority signal. | 10% |
+| Input                    | Description                                                 | Contribution |
+| ------------------------ | ----------------------------------------------------------- | ------------ |
+| Referring Domains        | Distinct root domains linking inbound.                      | 35%          |
+| Referring Domain Quality | Weighted by the provider's trust/authority metric.          | 25%          |
+| Link Velocity            | Growth or decay of referring domains over the past 90 days. | 15%          |
+| Anchor Text Diversity    | Guards against over-optimized / spam-pattern anchors.       | 15%          |
+| Brand Mentions           | Unlinked mentions treated as a soft authority signal.       | 10%          |
 
 ---
 
@@ -115,7 +115,7 @@ AIGVR = (Σ P_i · prominence_i)  /  N_prompts
 
 Where:
 
-- `P_i` = 1 if the brand appears in the response to prompt *i*, else 0
+- `P_i` = 1 if the brand appears in the response to prompt _i_, else 0
 - `prominence_i` = weighting based on position, typographical emphasis, and whether the mention is an inline citation vs. a passing mention
 - `N_prompts` = total prompts in the cluster
 
@@ -167,13 +167,13 @@ Measured via referrer logs where available (some AI engines expose `utm_source=c
 CCD = brand_mentions / category_prompt_volume
 ```
 
-Used as an *early-warning* signal — a falling CCD indicates the AI ecosystem is losing awareness of the brand *before* it shows up as a drop in traditional rankings.
+Used as an _early-warning_ signal — a falling CCD indicates the AI ecosystem is losing awareness of the brand _before_ it shows up as a drop in traditional rankings.
 
 ---
 
 ## 3.3 GEO Content Score (predictive, per-page)
 
-Applied to individual URLs *before* publication (or during an optimization pass). Answers: "how citation-worthy is this page structurally?"
+Applied to individual URLs _before_ publication (or during an optimization pass). Answers: "how citation-worthy is this page structurally?"
 
 ```
 GEO_Content_Score = 100 · (
@@ -187,23 +187,23 @@ GEO_Content_Score = 100 · (
 
 Each sub-score is a 0–1 value.
 
-| Sub-score | Weight | What it measures |
-| --- | --- | --- |
+| Sub-score                 | Weight  | What it measures                                                                                                                                                               |
+| ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Fact Interpretability** | **30%** | Density of verifiable facts, statistics, and hyperlinked primary-source citations. Highest weight because it is the largest empirically observed lift factor for AI citations. |
-| **Semantic Relevance** | **25%** | Alignment of content with the query / prompt intent (reuses the SRS method). |
-| **Conversational Tone** | **20%** | Does the content read like an answer to a natural-language question? Includes readability scoring, presence of direct Q→A structure. |
-| **Structure** | **15%** | Heading hierarchy cleanliness, modular chunks (lists, tables, FAQ, comparison blocks). |
-| **Engagement** | **10%** | Soft signals: images, examples, interactive elements, embedded expert quotes. |
+| **Semantic Relevance**    | **25%** | Alignment of content with the query / prompt intent (reuses the SRS method).                                                                                                   |
+| **Conversational Tone**   | **20%** | Does the content read like an answer to a natural-language question? Includes readability scoring, presence of direct Q→A structure.                                           |
+| **Structure**             | **15%** | Heading hierarchy cleanliness, modular chunks (lists, tables, FAQ, comparison blocks).                                                                                         |
+| **Engagement**            | **10%** | Soft signals: images, examples, interactive elements, embedded expert quotes.                                                                                                  |
 
 ### Interpretation bands
 
-| Score | Interpretation |
-| --- | --- |
-| 90–100 | Best-in-class GEO readiness. Publishable as-is. |
-| 75–89 | Strong. Tactical improvements recommended. |
-| 60–74 | Moderate. Needs structural improvements before publishing. |
-| 40–59 | Weak. Rework before publishing — fact interpretability is usually the gap. |
-| 0–39 | Fails GEO readiness. Major editorial remediation required. |
+| Score  | Interpretation                                                             |
+| ------ | -------------------------------------------------------------------------- |
+| 90–100 | Best-in-class GEO readiness. Publishable as-is.                            |
+| 75–89  | Strong. Tactical improvements recommended.                                 |
+| 60–74  | Moderate. Needs structural improvements before publishing.                 |
+| 40–59  | Weak. Rework before publishing — fact interpretability is usually the gap. |
+| 0–39   | Fails GEO readiness. Major editorial remediation required.                 |
 
 ### Worked example
 
@@ -217,7 +217,7 @@ Each sub-score is a 0–1 value.
 >
 > Final = `100 · (0.30·0.1 + 0.25·0.8 + 0.20·1.0 + 0.15·1.0 + 0.10·1.0) = 100 · (0.03 + 0.20 + 0.20 + 0.15 + 0.10) = 68`
 >
-> A 68 lands in the Moderate band. The 30% weight on Fact Interpretability *specifically* drags the score down, surfacing the correct remediation ("add statistics from primary sources") as the single highest-impact fix.
+> A 68 lands in the Moderate band. The 30% weight on Fact Interpretability _specifically_ drags the score down, surfacing the correct remediation ("add statistics from primary sources") as the single highest-impact fix.
 
 ---
 

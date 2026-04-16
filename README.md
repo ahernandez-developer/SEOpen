@@ -12,7 +12,7 @@ The digital discovery ecosystem is shifting from algorithmic retrieval to genera
 
 SEOpen is built on three convictions:
 
-1. **Teams need one tool that measures both SEO *and* GEO**, not two disconnected stacks.
+1. **Teams need one tool that measures both SEO _and_ GEO**, not two disconnected stacks.
 2. **The methodology itself must be open.** Scoring formulas, weightings, and algorithms are documented in `/docs` — not hidden behind a "black box".
 3. **Self-hosting should be first-class.** Run the full stack on your own infrastructure with one command.
 
@@ -20,12 +20,12 @@ SEOpen is built on three convictions:
 
 ## What's inside
 
-| Module | Purpose |
-| --- | --- |
-| **Technical SEO & Performance Auditor** | Full-domain crawling, Lighthouse/Core Web Vitals, structured data validation, internal link equity, redirect/status analysis. |
-| **AI Visibility & GEO Checker** | Tracks brand/entity mentions across generative engines. Scores factual density, semantic chunking, freshness, and citation-worthiness. |
-| **Keyword & Content Gap Analyzer** | Traditional keyword research augmented with **GEO prompt gap analysis** — identifies long-tail LLM prompts where you fail to appear as a cited source. |
-| **Scoring Engine** | Deterministic composite scores: SEO Score (0–100) and AI Visibility Score built from AIGVR, CER, AECR, and SRS sub-metrics. |
+| Module                                  | Purpose                                                                                                                                                |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Technical SEO & Performance Auditor** | Full-domain crawling, Lighthouse/Core Web Vitals, structured data validation, internal link equity, redirect/status analysis.                          |
+| **AI Visibility & GEO Checker**         | Tracks brand/entity mentions across generative engines. Scores factual density, semantic chunking, freshness, and citation-worthiness.                 |
+| **Keyword & Content Gap Analyzer**      | Traditional keyword research augmented with **GEO prompt gap analysis** — identifies long-tail LLM prompts where you fail to appear as a cited source. |
+| **Scoring Engine**                      | Deterministic composite scores: SEO Score (0–100) and AI Visibility Score built from AIGVR, CER, AECR, and SRS sub-metrics.                            |
 
 Full module specifications live in [`docs/modules.md`](docs/modules.md).
 

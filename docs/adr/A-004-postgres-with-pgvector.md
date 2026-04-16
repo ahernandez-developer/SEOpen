@@ -20,7 +20,7 @@ The tension sits between concerns 1 and 2. A dedicated vector database (Weaviate
 
 ## Decision
 
-SEOpen uses **PostgreSQL 16+** with the **`pgvector`** extension for all durable relational data *and* all embedding vectors. No separate vector database is introduced at MVP scale. Embedding dimensions, index type (HNSW as default), and distance metric (cosine as default, aligned with SRS methodology) are fixed in the schema migrations for reproducibility.
+SEOpen uses **PostgreSQL 16+** with the **`pgvector`** extension for all durable relational data _and_ all embedding vectors. No separate vector database is introduced at MVP scale. Embedding dimensions, index type (HNSW as default), and distance metric (cosine as default, aligned with SRS methodology) are fixed in the schema migrations for reproducibility.
 
 If a future deployment demonstrates that pgvector cannot meet its latency or throughput targets, a dedicated vector service may be introduced behind an adapter interface — but that requires a new ADR superseding this one.
 

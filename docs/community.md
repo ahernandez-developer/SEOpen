@@ -21,7 +21,7 @@ Online communities follow a predictable distribution: most users consume the pro
 
 ### Consumers
 
-Users who want the product to *work*. Rarely post in Discussions, never open a PR, and will churn silently if friction is high. They are served by:
+Users who want the product to _work_. Rarely post in Discussions, never open a PR, and will churn silently if friction is high. They are served by:
 
 - Impeccable README and quickstart. "Time to First Audit" under five minutes.
 - Tutorials that read like solved problems.
@@ -74,7 +74,7 @@ Full contribution workflow lives in [`CONTRIBUTING.md`](../CONTRIBUTING.md). Sum
 ### Code contributions
 
 - **Good First Issues** are labeled `good-first-issue` and grouped by area (crawler, scoring, UI, docs, providers).
-- **Larger work** should start with an issue or discussion to align on approach *before* code is written.
+- **Larger work** should start with an issue or discussion to align on approach _before_ code is written.
 - **Pull requests** follow the checklist in [`CONTRIBUTING.md`](../CONTRIBUTING.md).
 - **Review expectations.** Small PRs are triaged in days, large PRs within one to two weeks. No PR sits in limbo without explicit feedback.
 
@@ -119,14 +119,14 @@ Long-form write-ups demonstrating concrete workflows on real domains. Published 
 
 Channels are chosen for **low friction** and **searchability**, not for trendiness:
 
-| Channel | Purpose |
-| --- | --- |
-| **GitHub Issues** | Bug reports, feature requests. |
-| **GitHub Discussions** | Q&A, RFCs, show-and-tell, scoring methodology debates. |
-| **Discord (or chat)** | Real-time chat for contributors and engaged users. |
-| **Repository Releases** | Changelog, versioned release notes. |
-| **Documentation Site** | Long-form content, tutorials, Knowledge Base. |
-| **Project Blog** | Announcements, engineering posts. |
+| Channel                 | Purpose                                                |
+| ----------------------- | ------------------------------------------------------ |
+| **GitHub Issues**       | Bug reports, feature requests.                         |
+| **GitHub Discussions**  | Q&A, RFCs, show-and-tell, scoring methodology debates. |
+| **Discord (or chat)**   | Real-time chat for contributors and engaged users.     |
+| **Repository Releases** | Changelog, versioned release notes.                    |
+| **Documentation Site**  | Long-form content, tutorials, Knowledge Base.          |
+| **Project Blog**        | Announcements, engineering posts.                      |
 
 Intentionally not adopted at launch: mailing lists, IRC, forums with separate accounts. The bar for adding a channel is that an existing channel is demonstrably failing.
 
