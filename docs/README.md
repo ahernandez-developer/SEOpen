@@ -10,7 +10,7 @@ The documents are written to be read **in order**: each one builds on the previo
 2. [**Vision & Strategic Context**](vision.md) — the SEO → GEO paradigm shift and why SEOpen exists
 3. [**Modules & Feature Surface**](modules.md) — every capability the platform ships
 4. [**Scoring Models**](scoring.md) — SEO Score, AI Visibility Score, GEO Content Score, and the math behind them
-5. [**Architecture**](architecture.md) — polyglot microservices, queues, storage, deployment shapes
+5. [**Architecture**](architecture.md) — single-runtime TypeScript microservices, queues, storage, deployment shapes
 6. [**Data Integrations**](data-integrations.md) — BYOK providers (DataForSEO, SerpApi, Semrush, SE Ranking, …)
 7. [**Roadmap**](roadmap.md) — feature-oriented phased delivery plan
 8. [**Community & Contribution**](community.md) — governance, contribution, educational resources

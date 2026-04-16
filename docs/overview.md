@@ -1,6 +1,6 @@
 # Overview
 
-> **One-paragraph summary.** SEOpen is an open-source, self-hostable platform that unifies traditional Technical SEO auditing with Generative Engine Optimization (GEO) visibility tracking. It combines a distributed polyglot crawler (Node.js for rendering, Python for analysis) with deterministic scoring models and a bring-your-own-key (BYOK) integration layer for third-party data providers. The scoring methodology is fully documented and transparent.
+> **One-paragraph summary.** SEOpen is an open-source, self-hostable platform that unifies traditional Technical SEO auditing with Generative Engine Optimization (GEO) visibility tracking. It combines a distributed Node.js / TypeScript crawler and analysis stack with deterministic scoring models and a bring-your-own-key (BYOK) integration layer for third-party data providers. The scoring methodology is fully documented and transparent.
 
 ---
 
@@ -35,10 +35,10 @@ SEOpen delivers four tightly integrated capabilities:
 
 These sit on top of a distributed architecture designed to scale from a laptop (Docker Compose, one site) to a fleet (Kubernetes, millions of URLs):
 
-- **Node.js extraction workers** drive headless browsers, render JavaScript, execute Lighthouse.
-- **Python analysis workers** transform HTML → Markdown, compute deterministic scores, and call LLM APIs for semantic evaluations.
-- **Redis + RabbitMQ** coordinate distributed work queues and the URL frontier.
-- **PostgreSQL** stores structured reporting data; **object storage (S3/MinIO)** holds raw HTML and Lighthouse payloads.
+- **Extraction workers** (TypeScript, Crawlee / Puppeteer) drive headless browsers, render JavaScript, execute Lighthouse.
+- **Analysis workers** (TypeScript) transform HTML → Markdown via `@mozilla/readability` + `unified` / `rehype-remark`, compute deterministic scores, and call LLM APIs for semantic evaluations.
+- **BullMQ on Redis** coordinates distributed work queues and the URL frontier in a single backing store.
+- **PostgreSQL** (with the **pgvector** extension) stores structured reporting data and embeddings; **object storage (S3/MinIO)** holds raw HTML and Lighthouse payloads.
 - **BYOK integrations** plug into DataForSEO, SerpApi, SE Ranking, Semrush, OpenAI, Anthropic, etc.
 
 Full architecture detail in [`architecture.md`](architecture.md).
@@ -66,21 +66,23 @@ Full architecture detail in [`architecture.md`](architecture.md).
                               │
                  ┌────────────▼────────────┐
                  │       API Gateway       │
-                 │    (FastAPI / REST)     │
+                 │    (Fastify + Zod)      │
                  └──────┬──────────┬───────┘
                         │          │
         ┌───────────────▼──┐   ┌───▼────────────────┐
-        │ Extraction (Node)│   │ Analysis (Python)  │
+        │ Extraction (Node)│   │ Analysis (Node)    │
         │  Crawlee / PPTR  │   │  Scoring, NLP, LLM │
         └────────┬─────────┘   └─────────┬──────────┘
                  │                       │
-          ┌──────▼───────┐        ┌──────▼───────┐
-          │  RabbitMQ /  │        │  Redis (URL  │
-          │    BullMQ    │◀──────▶│   frontier)  │
-          └──────┬───────┘        └──────┬───────┘
-                 │                       │
-          ┌──────▼───────────────────────▼──────┐
-          │ PostgreSQL  •  S3/MinIO  •  Cache   │
+                 │      ┌──────────────┐ │
+                 └─────▶│    BullMQ    │◀┘
+                        │   on Redis   │
+                        │  URL frontier│
+                        │  + job queue │
+                        └──────┬───────┘
+                               │
+          ┌────────────────────▼─────────────────┐
+          │ PostgreSQL + pgvector  •  S3/MinIO   │
           └──────────────────────────────────────┘
 ```
 

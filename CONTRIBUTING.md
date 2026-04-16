@@ -98,10 +98,10 @@ Add only when the change is narrowly confined. Skip scope labels entirely for cr
 
 | Label | Code it covers |
 | :-- | :-- |
-| `scope:crawler` | Node.js extraction workers, Crawlee, Puppeteer, Lighthouse integration, URL frontier. |
-| `scope:analysis` | Python analysis workers, HTML → Markdown pipeline, NLP, embeddings. |
+| `scope:crawler` | Extraction workers, Crawlee, Puppeteer, Lighthouse integration, URL frontier. |
+| `scope:analysis` | Analysis workers, HTML → Markdown pipeline, NLP, embeddings. |
 | `scope:scoring` | Deterministic score engines and the formula implementations. |
-| `scope:api` | FastAPI gateway, auth, RBAC, request validation. |
+| `scope:api` | Fastify + Zod gateway, auth, RBAC, request validation. |
 | `scope:ui` | Next.js frontend, dashboards, exports. |
 | `scope:providers` | BYOK provider adapters. |
 | `scope:infra` | Docker Compose, Helm charts, CI workflows, release tooling. |
@@ -176,7 +176,7 @@ Review quality is the same bar whether a human or an agent wrote the code. Revie
 ### What's explicitly allowed
 
 - **Using an agent to draft the entire PR**, including tests, as long as you read, understand, and test the output.
-- **Using an agent to translate between Node and Python** for polyglot work — common and genuinely useful here.
+- **Using an agent to migrate or translate snippets** when evaluating third-party libraries or prior-art ports — common and genuinely useful here.
 - **Using an agent to explore unfamiliar codebases** and synthesize a proposed change.
 - **Using an agent to write documentation**, including this file. Transparency matters more than authorship.
 - **Pasting session transcripts** into the PR body. If a reviewer asks "why did you do it this way," a transcript is a valid answer.
@@ -204,36 +204,35 @@ The project welcomes AI-assisted contributions unconditionally. It also reviews 
 
 > **Phase 0 note.** No code has been merged yet. The commands below describe the **target** development loop and will become live when Phase 1 begins. If you want to contribute code before then, open a discussion first — you would be defining the project structure rather than contributing to it.
 
-SEOpen is a polyglot stack. You will need:
+SEOpen is a single-runtime TypeScript stack. You will need:
 
-- **Node.js ≥ 20** — extraction workers, frontend, Lighthouse.
-- **Python ≥ 3.11** — analysis workers, API gateway, scoring engines.
-- **Docker & Docker Compose** — local PostgreSQL, Redis, RabbitMQ, MinIO.
+- **Node.js ≥ 20** — extraction, analysis, scoring, API gateway, and frontend all ship as TypeScript.
+- **pnpm** — workspace dependency manager.
+- **Docker & Docker Compose** — local PostgreSQL (with pgvector), Redis, and MinIO.
 
 ```bash
 git clone https://github.com/<org>/seopen.git
 cd seopen
-docker compose up -d              # Postgres, Redis, RabbitMQ, MinIO
-pnpm install                      # Node workspaces (extraction, frontend)
-uv sync                           # Python workspaces (analysis, api, scoring)
-pnpm test && uv run pytest        # full suite must stay green
+docker compose up -d              # Postgres + pgvector, Redis, MinIO
+pnpm install                      # pnpm workspaces (extractor, analysis, api, scoring, web, cli)
+pnpm test                         # full suite must stay green
 ```
 
 The exact commands will be pinned in `docs/development-setup.md` when Phase 1 opens. Target Time-to-First-Audit from a clean clone is **under five minutes**.
 
 ### Running services standalone
 
-You do not need the full stack to develop against a single service. Each Node and Python package can be booted in isolation against the Docker Compose infrastructure:
+You do not need the full stack to develop against a single service. Each workspace package can be booted in isolation against the Docker Compose infrastructure:
 
 ```bash
 # Extraction worker
 pnpm --filter @seopen/extractor dev
 
 # Analysis worker
-uv run --package seopen-analysis celery -A seopen_analysis worker -l info
+pnpm --filter @seopen/analysis dev
 
 # API gateway
-uv run --package seopen-api uvicorn seopen_api.main:app --reload
+pnpm --filter @seopen/api dev
 
 # Frontend
 pnpm --filter @seopen/web dev
@@ -249,21 +248,20 @@ SEOpen's Phase 1 quality goal is that **its own docs pass its own audit**. Once 
 
 ```text
 services/
-├── extractor/            Node.js · Crawlee, Puppeteer, Lighthouse
+├── extractor/            TypeScript · Crawlee, Puppeteer, Lighthouse
 │   └── tests/
-├── analysis/             Python · HTML→Markdown, NLP, scoring
+├── analysis/             TypeScript · HTML→Markdown, NLP, embeddings
 │   └── tests/
-├── api/                  Python · FastAPI gateway
+├── api/                  TypeScript · Fastify + Zod gateway
 │   └── tests/
-├── scoring/              Python · deterministic score engines
+├── scoring/              TypeScript · deterministic score engines
 │   └── tests/            (property tests for every formula)
 └── web/                  TypeScript · Next.js frontend
     └── tests/
 ```
 
-- **Node packages** use the built-in `node:test` runner where possible; Vitest is acceptable for the frontend.
-- **Python packages** use `pytest` with `pytest-asyncio`.
-- **Scoring packages** must include property-based tests (Hypothesis / fast-check) for every formula — the inputs are continuous and off-by-one errors in thresholds are otherwise invisible.
+- **Backend and shared packages** use the built-in `node:test` runner where possible; Vitest is acceptable for the frontend.
+- **Scoring packages** must include property-based tests (`fast-check`) for every formula — the inputs are continuous and off-by-one errors in thresholds are otherwise invisible.
 - **Provider adapters** use **recorded-response fixtures**, never live API calls, to avoid CI quota burn.
 
 Exact layout will be finalized when Phase 1 opens.
@@ -272,9 +270,8 @@ Exact layout will be finalized when Phase 1 opens.
 
 ## Coding conventions
 
-- **TypeScript strict mode.** `strict: true` and `exactOptionalPropertyTypes: true` for every Node package. Optional fields use `?:` and conditional spread (`...(x ? { x } : {})`) rather than assigning `undefined`.
-- **Python `mypy --strict`.** Every Python package is fully typed. Public functions use `from __future__ import annotations` and PEP 604 unions. Pydantic v2 for schema validation.
-- **Pure engines.** Scoring and SARIF-style report generators take their inputs as plain values and never read `process.env`, `os.environ`, or `fs.*` / `pathlib.*` directly. Environment reads live in dedicated config modules. Filesystem I/O is concentrated at service entrypoints and hook scripts.
+- **TypeScript strict mode.** `strict: true` and `exactOptionalPropertyTypes: true` for every package. Optional fields use `?:` and conditional spread (`...(x ? { x } : {})`) rather than assigning `undefined`. Schema validation at every boundary uses Zod.
+- **Pure engines.** Scoring and SARIF-style report generators take their inputs as plain values and never read `process.env` or `fs.*` directly. Environment reads live in dedicated config modules. Filesystem I/O is concentrated at service entrypoints and hook scripts.
 - **English only.** Code, docs, commit messages — all in English. SEOpen is published under an international license; keep it accessible to international contributors.
 - **No suppression markers.** `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, `# type: ignore`, `# noqa`, `# nosec` are flagged in review. If you need to suppress a lint, fix the lint instead; if you truly cannot, open an issue explaining why.
 - **Conventional Commits.** `feat(crawler): add depth limit`, `fix(scoring): correct LCP threshold interpolation`, `docs(scoring): worked example for GEO Content Score`, `refactor(api): extract provider adapter interface`, `test(crawler): fixture for SPA rendering`, `chore(deps): bump puppeteer to 22.x`.
@@ -359,7 +356,7 @@ Before asking for review:
 Until Phase 1 ships a CLI, bug reports go through GitHub Issues. Include:
 
 1. SEOpen version or commit SHA.
-2. Platform and runtime versions (Node, Python, Docker).
+2. Platform and runtime versions (Node, pnpm, Docker).
 3. Steps to reproduce.
 4. Expected vs. actual behavior.
 5. Relevant logs (with secrets redacted).

@@ -92,19 +92,20 @@ Users must supply at least one generative provider to use the GEO Checker's full
 
 ## 5.4 Provider adapter contract
 
-Every provider is wrapped in an **adapter** — a thin internal module that maps the provider's native response shape onto SEOpen's internal, provider-agnostic data model. The adapter contract is:
+Every provider is wrapped in an **adapter** — a thin internal module that maps the provider's native response shape onto SEOpen's internal, provider-agnostic data model. The adapter contract is expressed as a TypeScript interface (request/response types are defined with Zod schemas in the shared `@seopen/providers` package):
 
-```python
-class Provider:
-    name: str                        # e.g. "dataforseo"
-    category: set[IntegrationCategory]
+```ts
+export interface Provider {
+  readonly name: string; // e.g. "dataforseo"
+  readonly categories: ReadonlySet<IntegrationCategory>;
 
-    def health_check(self) -> HealthStatus: ...
-    def get_keyword_metrics(req: KeywordRequest) -> KeywordMetrics: ...
-    def get_serp(req: SerpRequest) -> SerpResult: ...
-    def get_backlinks(req: BacklinkRequest) -> BacklinkResult: ...
-    def get_domain_overview(req: DomainRequest) -> DomainOverview: ...
-    # ... etc.
+  healthCheck(): Promise<HealthStatus>;
+  getKeywordMetrics(req: KeywordRequest): Promise<KeywordMetrics>;
+  getSerp(req: SerpRequest): Promise<SerpResult>;
+  getBacklinks(req: BacklinkRequest): Promise<BacklinkResult>;
+  getDomainOverview(req: DomainRequest): Promise<DomainOverview>;
+  // ... etc.
+}
 ```
 
 The adapter layer enforces:

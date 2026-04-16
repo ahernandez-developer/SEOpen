@@ -54,7 +54,7 @@ At a glance:
 - [**Vision**](docs/vision.md) — why SEOpen exists
 - [**Modules**](docs/modules.md) — what the platform ships
 - [**Scoring**](docs/scoring.md) — every score, every formula
-- [**Architecture**](docs/architecture.md) — polyglot services, queues, storage
+- [**Architecture**](docs/architecture.md) — single-runtime TypeScript services, queues, storage
 - [**Data Integrations**](docs/data-integrations.md) — BYOK providers
 - [**Roadmap**](docs/roadmap.md) — phased delivery plan
 - [**Community**](docs/community.md) — governance and contribution
