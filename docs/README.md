@@ -9,12 +9,17 @@ The documents are written to be read **in order**: each one builds on the previo
 1. [**Overview**](overview.md) — executive summary of the whole project
 2. [**Vision & Strategic Context**](vision.md) — the SEO → GEO paradigm shift and why SEOpen exists
 3. [**Modules & Feature Surface**](modules.md) — every capability the platform ships
-4. [**Scoring Models**](scoring.md) — SEO Score, AI Visibility Score, GEO Content Score, and the math behind them
+4. [**Scoring Models**](scoring.md) — SEO Score, AI Visibility Score, GEO Content Score, GEO Site Readiness Score, and the math behind them
 5. [**Architecture**](architecture.md) — single-runtime TypeScript microservices, queues, storage, deployment shapes
-6. [**Data Integrations**](data-integrations.md) — BYOK providers (DataForSEO, SerpApi, Semrush, SE Ranking, …)
+6. [**Data Integrations**](data-integrations.md) — BYOK providers
 7. [**Roadmap**](roadmap.md) — feature-oriented phased delivery plan
 8. [**Community & Contribution**](community.md) — governance, contribution, educational resources
-9. [**Glossary**](glossary.md) — terminology reference (SEO, GEO, AIGVR, SRS, pgvector, …)
+9. [**Glossary**](glossary.md) — terminology reference
+
+## Build & run
+
+- [**Development setup**](development.md) — prerequisites, install, workspace layout, test commands, coding conventions, troubleshooting.
+- [**`seopen` CLI reference**](cli.md) — the shipped command surface, subcommand-by-subcommand.
 
 ## Quick jumps
 
@@ -24,6 +29,8 @@ The documents are written to be read **in order**: each one builds on the previo
 - **"How is it built?"** → [architecture.md](architecture.md)
 - **"How do I plug in third-party data?"** → [data-integrations.md](data-integrations.md)
 - **"What ships first?"** → [roadmap.md](roadmap.md)
+- **"How do I run it locally?"** → [development.md](development.md)
+- **"What can the CLI do right now?"** → [cli.md](cli.md)
 - **"How do I contribute?"** → [community.md](community.md) + [`../CONTRIBUTING.md`](../CONTRIBUTING.md)
 - **"What does this term mean?"** → [glossary.md](glossary.md)
 
